@@ -20,7 +20,7 @@
 
 <br/>
 
-[🌐 Live Demo](https://kenedy-duwarah.github.io/CalmDose/) &nbsp;•&nbsp; [🐞 Report Bug](#) &nbsp;•&nbsp; [💡 Request Feature](#)
+[🌐 Live Demo](https://kenedy-duwarah.github.io/CalmDose/) &nbsp;•&nbsp; 
 
 </div>
 
