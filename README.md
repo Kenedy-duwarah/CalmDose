@@ -277,7 +277,7 @@ CalmDose is for informational and organizational purposes only. It is **not** a 
 
 ### Designed and built by **Kenedy Duwarah**
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](#)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](www.linkedin.com/in/kenedy-duwarah-42bb43287)
 [![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](#)
 
 <br/>
