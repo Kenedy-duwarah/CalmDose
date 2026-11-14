@@ -1665,6 +1665,211 @@
     }
 
     /* =========================================================
+       12B. AUTH MODAL, TABS & USER BADGE
+       ========================================================= */
+    .user-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 0.88rem;
+      box-shadow: var(--clay-shadow-sm);
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .auth-controls-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .auth-controls-row[hidden],
+    .drawer-auth-block[hidden] {
+      display: none;
+    }
+
+    .drawer-auth-block {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 16px;
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      box-shadow: var(--clay-inset);
+    }
+
+    .drawer-auth-btns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .account-status-card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 18px 20px;
+      background: var(--surface-lavender);
+    }
+
+    .account-status-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .auth-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 240;
+      background: rgba(15, 32, 36, 0.52);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 220ms ease, visibility 220ms ease;
+    }
+
+    .auth-backdrop.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .auth-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 250;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 220ms ease, visibility 220ms ease;
+    }
+
+    .auth-modal.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .auth-dialog {
+      width: 100%;
+      max-width: 460px;
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--clay-shadow-hover);
+      border: 1px solid var(--border-subtle);
+      transform: translateY(14px) scale(0.98);
+      transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .auth-dialog::-webkit-scrollbar {
+      display: none;
+    }
+
+    .auth-modal.open .auth-dialog {
+      transform: translateY(0) scale(1);
+    }
+
+    .auth-modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding: 5px;
+      border-radius: var(--radius-pill);
+      background: var(--surface-soft);
+      box-shadow: var(--clay-inset);
+      margin-bottom: 16px;
+    }
+
+    .auth-tab {
+      min-height: 44px;
+      border-radius: var(--radius-pill);
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      transition: background-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .auth-tab[aria-selected="true"] {
+      background: var(--surface);
+      color: var(--primary);
+      box-shadow: var(--clay-shadow-sm);
+    }
+
+    .auth-rule-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      background: var(--surface-mint);
+      color: var(--text);
+      font-size: 0.86rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      box-shadow: var(--clay-shadow-sm);
+    }
+
+    .password-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .password-wrap .clay-input {
+      padding-right: 52px;
+    }
+
+    .pw-toggle-btn {
+      position: absolute;
+      right: 6px;
+      min-width: 40px;
+      min-height: 40px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      transition: color var(--transition-fast), background-color var(--transition-fast);
+    }
+
+    .pw-toggle-btn:hover {
+      color: var(--text);
+      background: var(--surface-soft);
+    }
+
+    .auth-form[hidden] {
+      display: none;
+    }
+
+    /* =========================================================
        13. RESPONSIVE BREAKPOINTS & REDUCED MOTION
        ========================================================= */
     @media (max-width: 1080px) {
@@ -1673,7 +1878,7 @@
       }
     }
 
-    @media (max-width: 920px) {
+    @media (max-width: 1020px) {
       .nav-links,
       .nav-desktop-controls {
         display: none;
@@ -1681,6 +1886,9 @@
       .hamburger-btn {
         display: inline-flex;
       }
+    }
+
+    @media (max-width: 920px) {
       .hero-grid {
         grid-template-columns: 1fr;
         gap: 28px;
@@ -1806,7 +2014,18 @@
             <span class="sr-only" id="theme-toggle-label">Toggle dark mode</span>
           </button>
 
-          <a href="#tracker" class="clay-btn clay-btn--accent clay-btn--sm">Get Started</a>
+          <div class="auth-controls-row" id="nav-auth-guest">
+            <button type="button" class="clay-btn clay-btn--ghost clay-btn--sm" data-open-auth="login">Log In</button>
+            <button type="button" class="clay-btn clay-btn--accent clay-btn--sm" data-open-auth="signup">Sign Up</button>
+          </div>
+
+          <div class="auth-controls-row" id="nav-auth-user" hidden>
+            <span class="user-badge" id="nav-username-badge" title="Signed in user">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span id="nav-username-text"></span>
+            </span>
+            <button type="button" class="clay-btn clay-btn--ghost clay-btn--sm" id="nav-logout-btn">Log Out</button>
+          </div>
         </div>
 
         <button
@@ -1881,6 +2100,22 @@
           <span id="drawer-theme-text">Dark mode</span>
         </button>
       </div>
+    </div>
+
+    <div class="drawer-auth-block" id="drawer-auth-guest">
+      <span style="font-weight:700; font-size:0.92rem; color:var(--text);">Save your personal schedule</span>
+      <div class="drawer-auth-btns">
+        <button type="button" class="clay-btn clay-btn--ghost clay-btn--sm" data-open-auth="login">Log In</button>
+        <button type="button" class="clay-btn clay-btn--primary clay-btn--sm" data-open-auth="signup">Sign Up</button>
+      </div>
+    </div>
+
+    <div class="drawer-auth-block" id="drawer-auth-user" hidden>
+      <div class="drawer-setting-row">
+        <span>Signed in as</span>
+        <span class="user-badge" id="drawer-username-text"></span>
+      </div>
+      <button type="button" class="clay-btn clay-btn--ghost clay-btn--sm" id="drawer-logout-btn">Log Out</button>
     </div>
 
     <a href="#tracker" class="clay-btn clay-btn--accent drawer-cta">Get Started</a>
@@ -2239,13 +2474,31 @@
               </div>
             </form>
 
+            <div class="clay-card account-status-card" id="tracker-account-card">
+              <div id="tracker-account-guest">
+                <strong style="display:block; font-size:0.95rem;">Guest Schedule</strong>
+                <p style="font-size:0.88rem; margin-top:4px;">Log in or create a free local account to keep your own personal schedule.</p>
+                <div class="account-status-actions" style="margin-top:12px;">
+                  <button type="button" class="clay-btn clay-btn--primary clay-btn--sm" data-open-auth="login">Log In</button>
+                  <button type="button" class="clay-btn clay-btn--ghost clay-btn--sm" data-open-auth="signup">Sign Up</button>
+                </div>
+              </div>
+              <div id="tracker-account-user" hidden>
+                <strong style="display:block; font-size:0.95rem;">Personal Profile: <span id="tracker-username-text" style="color:var(--primary);"></span></strong>
+                <p style="font-size:0.88rem; margin-top:4px;">Your doses, water glasses, and streak are saved under your username on this device.</p>
+                <div class="account-status-actions" style="margin-top:12px;">
+                  <button type="button" class="clay-btn clay-btn--ghost clay-btn--sm" id="tracker-logout-btn">Log Out</button>
+                </div>
+              </div>
+            </div>
+
             <div class="privacy-note-box" role="note">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <rect x="3" y="11" width="18" height="11" rx="2" />
                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
               <p style="font-size:0.9rem; color:var(--text);">
-                <strong>100% Local Privacy:</strong> All medicine names, times, water counts, and streaks stay in your own browser. Nothing is sent to any server.
+                <strong>100% Local Privacy:</strong> Your account, medicine names, times, water counts, and streaks stay in your own browser. Nothing is sent to any server.
               </p>
             </div>
           </div>
@@ -2707,6 +2960,160 @@
     </div>
   </footer>
 
+  <!-- Login & Signup Modal Dialog -->
+  <div class="auth-backdrop" id="auth-backdrop" aria-hidden="true"></div>
+  <div
+    class="auth-modal"
+    id="auth-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="auth-modal-title"
+    aria-hidden="true"
+  >
+    <div class="auth-dialog">
+      <div class="auth-modal-head">
+        <h3 id="auth-modal-title">Welcome to CalmDose</h3>
+        <button type="button" class="clay-btn clay-btn--ghost clay-btn--sm" id="auth-close-btn" aria-label="Close account window">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+          Close
+        </button>
+      </div>
+
+      <div class="auth-tabs" role="tablist" aria-label="Account options">
+        <button type="button" class="auth-tab" role="tab" id="tab-login" aria-selected="true" aria-controls="login-form">Log In</button>
+        <button type="button" class="auth-tab" role="tab" id="tab-signup" aria-selected="false" aria-controls="signup-form">Sign Up</button>
+      </div>
+
+      <div class="auth-rule-note" role="note">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-top:2px;">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 16v-4M12 8h.01" />
+        </svg>
+        <span>Letters (A–Z, a–z) and numbers (0–9) only. No special characters or spaces allowed.</span>
+      </div>
+
+      <!-- Log In Form -->
+      <form id="login-form" class="auth-form" novalidate>
+        <div class="field-group">
+          <label class="field-label" for="login-username">Username</label>
+          <input
+            class="clay-input"
+            type="text"
+            id="login-username"
+            name="username"
+            pattern="[A-Za-z0-9]+"
+            minlength="3"
+            maxlength="24"
+            autocomplete="username"
+            placeholder="Letters and numbers only"
+            required
+          />
+          <span class="field-error" id="err-login-username" role="alert"></span>
+        </div>
+
+        <div class="field-group" style="margin-top:10px;">
+          <label class="field-label" for="login-password">Password</label>
+          <div class="password-wrap">
+            <input
+              class="clay-input"
+              type="password"
+              id="login-password"
+              name="password"
+              pattern="[A-Za-z0-9]+"
+              minlength="6"
+              maxlength="32"
+              autocomplete="current-password"
+              placeholder="Letters and numbers only"
+              required
+            />
+            <button type="button" class="pw-toggle-btn" data-toggle-pw="login-password" aria-label="Show password" aria-pressed="false">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <span class="field-error" id="err-login-password" role="alert"></span>
+        </div>
+
+        <span class="field-error" id="err-login-form" role="alert" style="display:block; margin-top:4px;"></span>
+
+        <button type="submit" class="clay-btn clay-btn--primary" style="width:100%; margin-top:12px;">
+          Log In
+        </button>
+      </form>
+
+      <!-- Sign Up Form -->
+      <form id="signup-form" class="auth-form" novalidate hidden>
+        <div class="field-group">
+          <label class="field-label" for="signup-username">Choose a username</label>
+          <input
+            class="clay-input"
+            type="text"
+            id="signup-username"
+            name="username"
+            pattern="[A-Za-z0-9]+"
+            minlength="3"
+            maxlength="24"
+            autocomplete="username"
+            placeholder="3–24 letters and numbers"
+            required
+          />
+          <span class="field-error" id="err-signup-username" role="alert"></span>
+        </div>
+
+        <div class="field-group" style="margin-top:10px;">
+          <label class="field-label" for="signup-password">Create password</label>
+          <div class="password-wrap">
+            <input
+              class="clay-input"
+              type="password"
+              id="signup-password"
+              name="password"
+              pattern="[A-Za-z0-9]+"
+              minlength="6"
+              maxlength="32"
+              autocomplete="new-password"
+              placeholder="6–32 letters and numbers"
+              required
+            />
+            <button type="button" class="pw-toggle-btn" data-toggle-pw="signup-password" aria-label="Show password" aria-pressed="false">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <span class="field-error" id="err-signup-password" role="alert"></span>
+        </div>
+
+        <div class="field-group" style="margin-top:10px;">
+          <label class="field-label" for="signup-confirm">Confirm password</label>
+          <div class="password-wrap">
+            <input
+              class="clay-input"
+              type="password"
+              id="signup-confirm"
+              name="confirm"
+              pattern="[A-Za-z0-9]+"
+              minlength="6"
+              maxlength="32"
+              autocomplete="new-password"
+              placeholder="Repeat password"
+              required
+            />
+            <button type="button" class="pw-toggle-btn" data-toggle-pw="signup-confirm" aria-label="Show password" aria-pressed="false">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <span class="field-error" id="err-signup-confirm" role="alert"></span>
+        </div>
+
+        <span class="field-error" id="err-signup-form" role="alert" style="display:block; margin-top:4px;"></span>
+
+        <button type="submit" class="clay-btn clay-btn--accent" style="width:100%; margin-top:12px;">
+          Create Account
+        </button>
+      </form>
+    </div>
+  </div>
+
   <!-- Toast Container -->
   <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
 
@@ -2833,6 +3240,326 @@
         setDrawer(false);
       }
     });
+
+    /* ---------------------------------------------------------
+       MODULE 3B: LOCAL AUTHENTICATION (ALPHANUMERIC ONLY)
+       --------------------------------------------------------- */
+    const STORAGE_USERS = 'calmdose_users_v1';
+    const STORAGE_SESSION = 'calmdose_session_v1';
+    const ALPHANUMERIC_RE = /^[A-Za-z0-9]+$/;
+
+    const authModal = document.getElementById('auth-modal');
+    const authBackdrop = document.getElementById('auth-backdrop');
+    const authCloseBtn = document.getElementById('auth-close-btn');
+    const authModalTitle = document.getElementById('auth-modal-title');
+    const tabLoginBtn = document.getElementById('tab-login');
+    const tabSignupBtn = document.getElementById('tab-signup');
+    const loginForm = document.getElementById('login-form');
+    const signupForm = document.getElementById('signup-form');
+
+    const navAuthGuest = document.getElementById('nav-auth-guest');
+    const navAuthUser = document.getElementById('nav-auth-user');
+    const navUsernameText = document.getElementById('nav-username-text');
+    const drawerAuthGuest = document.getElementById('drawer-auth-guest');
+    const drawerAuthUser = document.getElementById('drawer-auth-user');
+    const drawerUsernameText = document.getElementById('drawer-username-text');
+    const trackerAccountGuest = document.getElementById('tracker-account-guest');
+    const trackerAccountUser = document.getElementById('tracker-account-user');
+    const trackerUsernameText = document.getElementById('tracker-username-text');
+
+    let currentSession = storage.get(STORAGE_SESSION, null);
+    let lastAuthTrigger = null;
+    let isAuthModalOpen = false;
+    let onAuthSessionChange = () => {};
+
+    async function hashPassword(password, salt) {
+      const payload = `${salt}:${password}`;
+      if (window.crypto && window.crypto.subtle && window.TextEncoder) {
+        const encoded = new TextEncoder().encode(payload);
+        const digest = await window.crypto.subtle.digest('SHA-256', encoded);
+        return Array.from(new Uint8Array(digest))
+          .map((b) => b.toString(16).padStart(2, '0'))
+          .join('');
+      }
+      // Fallback FNV-1a mix for non-secure local preview contexts
+      let h1 = 0x811c9dc5;
+      let h2 = 0x9e3779b9;
+      for (let i = 0; i < payload.length; i++) {
+        const ch = payload.charCodeAt(i);
+        h1 ^= ch;
+        h1 = Math.imul(h1, 0x01000193);
+        h2 ^= ch + i;
+        h2 = Math.imul(h2, 0x85ebca6b);
+      }
+      return `${(h1 >>> 0).toString(16)}_${(h2 >>> 0).toString(16)}`;
+    }
+
+    function createSalt() {
+      if (window.crypto && window.crypto.getRandomValues) {
+        const arr = new Uint8Array(12);
+        window.crypto.getRandomValues(arr);
+        return Array.from(arr, (b) => b.toString(16).padStart(2, '0')).join('');
+      }
+      return String(Date.now());
+    }
+
+    function updateAuthUI() {
+      const signedIn = Boolean(currentSession && currentSession.username);
+      const displayUser = signedIn ? currentSession.username : '';
+
+      navAuthGuest.hidden = signedIn;
+      navAuthUser.hidden = !signedIn;
+      navUsernameText.textContent = displayUser;
+
+      drawerAuthGuest.hidden = signedIn;
+      drawerAuthUser.hidden = !signedIn;
+      drawerUsernameText.textContent = displayUser;
+
+      trackerAccountGuest.hidden = signedIn;
+      trackerAccountUser.hidden = !signedIn;
+      trackerUsernameText.textContent = displayUser;
+    }
+
+    function clearAuthErrors() {
+      [
+        'err-login-username',
+        'err-login-password',
+        'err-login-form',
+        'err-signup-username',
+        'err-signup-password',
+        'err-signup-confirm',
+        'err-signup-form'
+      ].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = '';
+      });
+    }
+
+    function switchAuthTab(mode) {
+      const isSignup = mode === 'signup';
+      tabLoginBtn.setAttribute('aria-selected', String(!isSignup));
+      tabSignupBtn.setAttribute('aria-selected', String(isSignup));
+      loginForm.hidden = isSignup;
+      signupForm.hidden = !isSignup;
+      authModalTitle.textContent = isSignup ? 'Create Your Account' : 'Welcome Back';
+      clearAuthErrors();
+    }
+
+    function openAuthModal(mode = 'login', triggerEl = null) {
+      if (isDrawerOpen) setDrawer(false);
+      lastAuthTrigger = triggerEl || document.activeElement;
+      switchAuthTab(mode);
+      isAuthModalOpen = true;
+      authModal.classList.add('open');
+      authBackdrop.classList.add('open');
+      authModal.setAttribute('aria-hidden', 'false');
+      authBackdrop.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('drawer-open');
+
+      const focusTarget = document.getElementById(mode === 'signup' ? 'signup-username' : 'login-username');
+      window.setTimeout(() => focusTarget && focusTarget.focus(), 60);
+    }
+
+    function closeAuthModal() {
+      if (!isAuthModalOpen) return;
+      isAuthModalOpen = false;
+      authModal.classList.remove('open');
+      authBackdrop.classList.remove('open');
+      authModal.setAttribute('aria-hidden', 'true');
+      authBackdrop.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('drawer-open');
+      loginForm.reset();
+      signupForm.reset();
+      document.querySelectorAll('[data-toggle-pw]').forEach((btn) => {
+        const target = document.getElementById(btn.dataset.togglePw);
+        if (target) target.type = 'password';
+        btn.setAttribute('aria-pressed', 'false');
+        btn.setAttribute('aria-label', 'Show password');
+      });
+      clearAuthErrors();
+      if (lastAuthTrigger && typeof lastAuthTrigger.focus === 'function' && lastAuthTrigger.offsetParent !== null) {
+        lastAuthTrigger.focus();
+      } else if (menuToggle && menuToggle.offsetParent !== null) {
+        menuToggle.focus();
+      }
+    }
+
+    document.querySelectorAll('[data-open-auth]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        openAuthModal(btn.dataset.openAuth, btn);
+      });
+    });
+
+    tabLoginBtn.addEventListener('click', () => {
+      switchAuthTab('login');
+      document.getElementById('login-username').focus();
+    });
+    tabSignupBtn.addEventListener('click', () => {
+      switchAuthTab('signup');
+      document.getElementById('signup-username').focus();
+    });
+    authCloseBtn.addEventListener('click', closeAuthModal);
+    authBackdrop.addEventListener('click', closeAuthModal);
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isAuthModalOpen) {
+        closeAuthModal();
+      }
+    });
+
+    // Strictly block and warn on any special characters or spaces in real time
+    const authFieldPairs = [
+      ['login-username', 'err-login-username'],
+      ['login-password', 'err-login-password'],
+      ['signup-username', 'err-signup-username'],
+      ['signup-password', 'err-signup-password'],
+      ['signup-confirm', 'err-signup-confirm']
+    ];
+
+    authFieldPairs.forEach(([inputId, errId]) => {
+      const inputEl = document.getElementById(inputId);
+      const errEl = document.getElementById(errId);
+      inputEl.addEventListener('input', () => {
+        const raw = inputEl.value;
+        const cleaned = raw.replace(/[^A-Za-z0-9]/g, '');
+        if (cleaned !== raw) {
+          inputEl.value = cleaned;
+          errEl.textContent = 'No special characters or spaces allowed. Use letters and numbers only.';
+        } else if (errEl.textContent.includes('special characters')) {
+          errEl.textContent = '';
+        }
+        document.getElementById('err-login-form').textContent = '';
+        document.getElementById('err-signup-form').textContent = '';
+      });
+    });
+
+    // Show / hide password toggles
+    document.querySelectorAll('[data-toggle-pw]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const target = document.getElementById(btn.dataset.togglePw);
+        if (!target) return;
+        const show = target.type === 'password';
+        target.type = show ? 'text' : 'password';
+        btn.setAttribute('aria-pressed', String(show));
+        btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+      });
+    });
+
+    signupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearAuthErrors();
+      const username = document.getElementById('signup-username').value;
+      const password = document.getElementById('signup-password').value;
+      const confirm = document.getElementById('signup-confirm').value;
+
+      const errUser = document.getElementById('err-signup-username');
+      const errPass = document.getElementById('err-signup-password');
+      const errConfirm = document.getElementById('err-signup-confirm');
+      const errForm = document.getElementById('err-signup-form');
+
+      let valid = true;
+      if (!ALPHANUMERIC_RE.test(username) || username.length < 3 || username.length > 24) {
+        errUser.textContent = 'Username must be 3–24 letters or numbers (no special characters).';
+        valid = false;
+      }
+      if (!ALPHANUMERIC_RE.test(password) || password.length < 6 || password.length > 32) {
+        errPass.textContent = 'Password must be 6–32 letters or numbers (no special characters).';
+        valid = false;
+      }
+      if (confirm !== password || !confirm) {
+        errConfirm.textContent = 'Passwords do not match.';
+        valid = false;
+      }
+      if (!valid) {
+        showToast('Please fix the highlighted sign up fields.', 'error');
+        return;
+      }
+
+      const users = storage.get(STORAGE_USERS, {});
+      const key = username.toLowerCase();
+      if (users[key]) {
+        errForm.textContent = 'That username is already registered on this device. Try logging in instead.';
+        showToast('Username already exists.', 'error');
+        return;
+      }
+
+      const salt = createSalt();
+      const hash = await hashPassword(password, salt);
+      users[key] = { username, salt, hash, createdAt: Date.now() };
+      storage.set(STORAGE_USERS, users);
+
+      currentSession = { username };
+      storage.set(STORAGE_SESSION, currentSession);
+      updateAuthUI();
+      onAuthSessionChange();
+      closeAuthModal();
+      showToast(`Account created! Welcome, ${username}.`);
+    });
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearAuthErrors();
+      const username = document.getElementById('login-username').value;
+      const password = document.getElementById('login-password').value;
+
+      const errUser = document.getElementById('err-login-username');
+      const errPass = document.getElementById('err-login-password');
+      const errForm = document.getElementById('err-login-form');
+
+      let valid = true;
+      if (!ALPHANUMERIC_RE.test(username) || username.length < 3) {
+        errUser.textContent = 'Enter a valid username (letters and numbers only, min 3).';
+        valid = false;
+      }
+      if (!ALPHANUMERIC_RE.test(password) || password.length < 6) {
+        errPass.textContent = 'Enter a valid password (letters and numbers only, min 6).';
+        valid = false;
+      }
+      if (!valid) {
+        showToast('Please check your username and password.', 'error');
+        return;
+      }
+
+      const users = storage.get(STORAGE_USERS, {});
+      const record = users[username.toLowerCase()];
+      if (!record) {
+        errForm.textContent = 'Account not found. Please check your username or sign up.';
+        showToast('Invalid username or password.', 'error');
+        return;
+      }
+
+      const checkHash = await hashPassword(password, record.salt);
+      if (checkHash !== record.hash) {
+        errForm.textContent = 'Incorrect password. Please try again.';
+        showToast('Invalid username or password.', 'error');
+        return;
+      }
+
+      currentSession = { username: record.username };
+      storage.set(STORAGE_SESSION, currentSession);
+      updateAuthUI();
+      onAuthSessionChange();
+      closeAuthModal();
+      showToast(`Welcome back, ${record.username}!`);
+    });
+
+    function handleLogout() {
+      const oldName = currentSession?.username;
+      currentSession = null;
+      try {
+        window.localStorage.removeItem(STORAGE_SESSION);
+      } catch {
+        // Ignore storage errors
+      }
+      if (isDrawerOpen) setDrawer(false);
+      updateAuthUI();
+      onAuthSessionChange();
+      showToast(oldName ? `Logged out of ${oldName}.` : 'Logged out.');
+    }
+
+    document.getElementById('nav-logout-btn').addEventListener('click', handleLogout);
+    document.getElementById('drawer-logout-btn').addEventListener('click', handleLogout);
+    document.getElementById('tracker-logout-btn').addEventListener('click', handleLogout);
+    updateAuthUI();
 
     // Active Navigation Highlight via IntersectionObserver
     const sectionIds = ['home', 'about', 'how-it-works', 'tracker', 'services', 'doctors', 'faq', 'contact'];
@@ -3294,9 +4021,16 @@
     /* ---------------------------------------------------------
        MODULE 6: MEDICINE TRACKER, STREAK, WATER & BMI LOGIC
        --------------------------------------------------------- */
-    const STORAGE_MEDS = 'calmdose_medicines_v1';
-    const STORAGE_WATER = 'calmdose_water_v1';
-    const STORAGE_STREAK = 'calmdose_streak_v1';
+    function getStorageKeys() {
+      const suffix = currentSession && currentSession.username
+        ? `_${currentSession.username.toLowerCase()}`
+        : '';
+      return {
+        meds: `calmdose_medicines_v1${suffix}`,
+        water: `calmdose_water_v1${suffix}`,
+        streak: `calmdose_streak_v1${suffix}`
+      };
+    }
 
     function getTodayDateKey() {
       const d = new Date();
@@ -3311,19 +4045,28 @@
       ];
     }
 
-    let medicines = storage.get(STORAGE_MEDS, null);
-    if (!Array.isArray(medicines)) {
-      medicines = createDemoMedicines();
-      storage.set(STORAGE_MEDS, medicines);
+    let medicines = [];
+    let waterState = { date: getTodayDateKey(), glasses: 4 };
+    let streakState = { count: 1, lastCompletedDate: null };
+
+    function loadTrackerState() {
+      const keys = getStorageKeys();
+      medicines = storage.get(keys.meds, null);
+      if (!Array.isArray(medicines)) {
+        medicines = createDemoMedicines();
+        storage.set(keys.meds, medicines);
+      }
+
+      waterState = storage.get(keys.water, { date: getTodayDateKey(), glasses: 4 });
+      if (waterState.date !== getTodayDateKey()) {
+        waterState = { date: getTodayDateKey(), glasses: 0 };
+        storage.set(keys.water, waterState);
+      }
+
+      streakState = storage.get(keys.streak, { count: 1, lastCompletedDate: null });
     }
 
-    let waterState = storage.get(STORAGE_WATER, { date: getTodayDateKey(), glasses: 4 });
-    if (waterState.date !== getTodayDateKey()) {
-      waterState = { date: getTodayDateKey(), glasses: 0 };
-      storage.set(STORAGE_WATER, waterState);
-    }
-
-    let streakState = storage.get(STORAGE_STREAK, { count: 1, lastCompletedDate: null });
+    loadTrackerState();
 
     const scheduleListEl = document.getElementById('schedule-list');
     const medForm = document.getElementById('medicine-form');
@@ -3409,7 +4152,7 @@
       if (allTaken && streakState.lastCompletedDate !== today) {
         streakState.count = (streakState.count || 0) + 1;
         streakState.lastCompletedDate = today;
-        storage.set(STORAGE_STREAK, streakState);
+        storage.set(getStorageKeys().streak, streakState);
       }
       streakValueEl.textContent = String(streakState.count);
 
@@ -3554,7 +4297,7 @@
           triggerHeroSpin();
           showToast(`Marked "${med.name}" as taken!`);
         }
-        storage.set(STORAGE_MEDS, medicines);
+        storage.set(getStorageKeys().meds, medicines);
         renderSchedule();
       } else if (action === 'edit') {
         medEditIdInput.value = med.id;
@@ -3569,7 +4312,7 @@
       } else if (action === 'delete') {
         medicines = medicines.filter((m) => m.id !== id);
         if (medEditIdInput.value === id) resetMedForm();
-        storage.set(STORAGE_MEDS, medicines);
+        storage.set(getStorageKeys().meds, medicines);
         renderSchedule();
         showToast(`Removed "${med.name}" from schedule.`);
       }
@@ -3630,18 +4373,19 @@
         showToast(`Added "${name}" to today's schedule.`);
       }
 
-      storage.set(STORAGE_MEDS, medicines);
+      storage.set(getStorageKeys().meds, medicines);
       resetMedForm();
       renderSchedule();
     });
 
     function resetDemoData() {
+      const keys = getStorageKeys();
       medicines = createDemoMedicines();
       waterState = { date: getTodayDateKey(), glasses: 4 };
       streakState = { count: 1, lastCompletedDate: null };
-      storage.set(STORAGE_MEDS, medicines);
-      storage.set(STORAGE_WATER, waterState);
-      storage.set(STORAGE_STREAK, streakState);
+      storage.set(keys.meds, medicines);
+      storage.set(keys.water, waterState);
+      storage.set(keys.streak, streakState);
       resetMedForm();
       renderSchedule();
       renderWater();
@@ -3667,7 +4411,7 @@
     document.getElementById('water-plus').addEventListener('click', () => {
       if (waterState.glasses < 12) {
         waterState.glasses += 1;
-        storage.set(STORAGE_WATER, waterState);
+        storage.set(getStorageKeys().water, waterState);
         renderWater();
       }
     });
@@ -3675,7 +4419,7 @@
     document.getElementById('water-minus').addEventListener('click', () => {
       if (waterState.glasses > 0) {
         waterState.glasses -= 1;
-        storage.set(STORAGE_WATER, waterState);
+        storage.set(getStorageKeys().water, waterState);
         renderWater();
       }
     });
@@ -3704,6 +4448,13 @@
 
       bmiResultEl.innerHTML = `<strong class="tabular-nums">BMI: ${rounded}</strong> — ${label}`;
     });
+
+    onAuthSessionChange = () => {
+      loadTrackerState();
+      resetMedForm();
+      renderSchedule();
+      renderWater();
+    };
 
     renderSchedule();
     renderWater();
