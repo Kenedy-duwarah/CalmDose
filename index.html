@@ -1,0 +1,3823 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CalmDose — Simple Daily Medicine Tracker &amp; Health Care</title>
+  <meta name="description" content="Calm, all-age daily medicine reminder and pill tracker with 3D capsule preview, water log, BMI check, and local-only privacy." />
+  <meta property="og:title" content="CalmDose — Simple Daily Medicine Tracker &amp; Health Care" />
+  <meta property="og:description" content="A calm, easy-to-read daily medicine companion built for every age—from busy families to older adults. Free and private in your browser." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#0f766e" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%230f766e'/%3E%3Crect x='16' y='24' width='32' height='16' rx='8' transform='rotate(-35 32 32)' fill='%23ffffff'/%3E%3Cpath d='M32 22v20M22 32h20' stroke='%230f766e' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E" />
+
+  <!-- Google Fonts: Poppins (headings) & Nunito (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Poppins:wght@600;700&display=swap" rel="stylesheet" />
+
+  <!-- Pinned Three.js Importmap -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <style>
+    /* =========================================================
+       1. CSS VARIABLES & DESIGN TOKENS (LIGHT + DARK CLAY)
+       ========================================================= */
+    :root {
+      color-scheme: light;
+      --font-heading: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --font-body: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+      /* Core Palette */
+      --bg: #f5f8f7;
+      --bg-alt: #edf3f1;
+      --surface: #ffffff;
+      --surface-soft: #f0f6f4;
+      --surface-mint: #e3f4ef;
+      --surface-blue: #e6f0fa;
+      --surface-lavender: #eceaf8;
+      --surface-peach: #fcece5;
+
+      /* Text & Contrast (WCAG AAA on body, AA+ on accents) */
+      --text: #13292d;
+      --text-muted: #40585c;
+      --text-on-primary: #ffffff;
+      --text-on-accent: #ffffff;
+
+      /* Brand & Actions */
+      --primary: #0d6e66;
+      --primary-hover: #0a5852;
+      --primary-soft: #d5efe9;
+      --secondary: #2b6cb0;
+      --secondary-soft: #dcebfa;
+      --accent: #c44d34;
+      --accent-hover: #a83d27;
+      --accent-soft: #fadfd6;
+
+      /* Semantic Status (always paired with icon + text) */
+      --status-taken-bg: #dff3ea;
+      --status-taken-text: #0f5c3a;
+      --status-due-bg: #fde9df;
+      --status-due-text: #9a341b;
+      --status-upcoming-bg: #e4eef9;
+      --status-upcoming-text: #1e4e82;
+
+      --focus-ring: #0b5ed7;
+      --border-subtle: rgba(19, 41, 45, 0.08);
+      --line-soft: rgba(13, 110, 102, 0.22);
+      --line-accent: rgba(13, 110, 102, 0.28);
+
+      /* Claymorphism Shadows (Light Mode) */
+      --clay-shadow:
+        10px 12px 24px rgba(19, 54, 58, 0.09),
+        -8px -8px 18px rgba(255, 255, 255, 0.92),
+        inset 3px 3px 6px rgba(255, 255, 255, 0.85),
+        inset -3px -4px 8px rgba(19, 54, 58, 0.05);
+
+      --clay-shadow-hover:
+        14px 16px 30px rgba(19, 54, 58, 0.13),
+        -10px -10px 22px rgba(255, 255, 255, 0.96),
+        inset 3px 3px 8px rgba(255, 255, 255, 0.9),
+        inset -3px -4px 10px rgba(19, 54, 58, 0.06);
+
+      --clay-shadow-sm:
+        6px 7px 14px rgba(19, 54, 58, 0.08),
+        -5px -5px 12px rgba(255, 255, 255, 0.9),
+        inset 2px 2px 5px rgba(255, 255, 255, 0.8),
+        inset -2px -2px 5px rgba(19, 54, 58, 0.05);
+
+      --clay-inset:
+        inset 4px 5px 10px rgba(19, 54, 58, 0.09),
+        inset -4px -4px 10px rgba(255, 255, 255, 0.92);
+
+      --clay-btn-shadow:
+        6px 8px 16px rgba(13, 110, 102, 0.24),
+        -3px -3px 8px rgba(255, 255, 255, 0.65),
+        inset 2px 2px 5px rgba(255, 255, 255, 0.35),
+        inset -2px -3px 6px rgba(0, 0, 0, 0.12);
+
+      --clay-accent-shadow:
+        6px 8px 16px rgba(196, 77, 52, 0.28),
+        -3px -3px 8px rgba(255, 255, 255, 0.65),
+        inset 2px 2px 5px rgba(255, 255, 255, 0.32),
+        inset -2px -3px 6px rgba(0, 0, 0, 0.14);
+
+      /* Radii & Spacing (8px scale) */
+      --radius-lg: 28px;
+      --radius-md: 20px;
+      --radius-sm: 14px;
+      --radius-pill: 999px;
+      --container-max: 1200px;
+      --nav-height: 76px;
+      --base-font-size: 18px;
+      --transition-fast: 200ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* Dark Mode Clay Palette */
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #141d26;
+      --bg-alt: #18232e;
+      --surface: #1d2a37;
+      --surface-soft: #223140;
+      --surface-mint: #193135;
+      --surface-blue: #1c2c40;
+      --surface-lavender: #25273d;
+      --surface-peach: #302427;
+
+      --text: #eef4f6;
+      --text-muted: #b8c9d0;
+      --text-on-primary: #ffffff;
+      --text-on-accent: #ffffff;
+
+      --primary: #14857b;
+      --primary-hover: #199c90;
+      --primary-soft: #1a4442;
+      --secondary: #539bf5;
+      --secondary-soft: #1d3552;
+      --accent: #d45b42;
+      --accent-hover: #e06b52;
+      --accent-soft: #432824;
+
+      --status-taken-bg: #173d2e;
+      --status-taken-text: #8ee5be;
+      --status-due-bg: #46251d;
+      --status-due-text: #ffb9a7;
+      --status-upcoming-bg: #1c3552;
+      --status-upcoming-text: #a8d0ff;
+
+      --focus-ring: #7dd3fc;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --line-soft: rgba(125, 211, 252, 0.22);
+      --line-accent: rgba(25, 156, 144, 0.38);
+
+      --clay-shadow:
+        10px 12px 26px rgba(5, 10, 16, 0.55),
+        -6px -6px 16px rgba(255, 255, 255, 0.04),
+        inset 2px 2px 6px rgba(255, 255, 255, 0.06),
+        inset -3px -4px 8px rgba(0, 0, 0, 0.32);
+
+      --clay-shadow-hover:
+        14px 16px 32px rgba(5, 10, 16, 0.65),
+        -8px -8px 20px rgba(255, 255, 255, 0.05),
+        inset 2px 2px 8px rgba(255, 255, 255, 0.08),
+        inset -3px -4px 10px rgba(0, 0, 0, 0.36);
+
+      --clay-shadow-sm:
+        6px 8px 16px rgba(5, 10, 16, 0.48),
+        -4px -4px 10px rgba(255, 255, 255, 0.04),
+        inset 2px 2px 4px rgba(255, 255, 255, 0.06),
+        inset -2px -2px 5px rgba(0, 0, 0, 0.28);
+
+      --clay-inset:
+        inset 4px 5px 10px rgba(5, 10, 16, 0.55),
+        inset -3px -3px 8px rgba(255, 255, 255, 0.05);
+
+      --clay-btn-shadow:
+        6px 8px 18px rgba(5, 10, 16, 0.5),
+        -2px -2px 8px rgba(255, 255, 255, 0.06),
+        inset 2px 2px 5px rgba(255, 255, 255, 0.18),
+        inset -2px -3px 6px rgba(0, 0, 0, 0.25);
+
+      --clay-accent-shadow:
+        6px 8px 18px rgba(5, 10, 16, 0.5),
+        -2px -2px 8px rgba(255, 255, 255, 0.06),
+        inset 2px 2px 5px rgba(255, 255, 255, 0.2),
+        inset -2px -3px 6px rgba(0, 0, 0, 0.25);
+    }
+
+    /* =========================================================
+       2. RESET & BASE STYLES
+       ========================================================= */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: var(--base-font-size);
+      scroll-behavior: smooth;
+      scroll-padding-top: calc(var(--nav-height) + 16px);
+      overflow-x: clip;
+    }
+
+    body {
+      font-family: var(--font-body);
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--text);
+      background-color: var(--bg);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: clip;
+      transition: background-color 250ms ease, color 250ms ease;
+    }
+
+    /* Hide visible scrollbar while keeping full scroll functionality */
+    html, body, .mobile-drawer, textarea {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    html::-webkit-scrollbar,
+    body::-webkit-scrollbar,
+    .mobile-drawer::-webkit-scrollbar,
+    textarea::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+
+    body.drawer-open {
+      overflow: hidden;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      line-height: 1.25;
+      color: var(--text);
+      text-wrap: balance;
+    }
+
+    h1 { font-size: clamp(2rem, 4.2vw, 3.1rem); }
+    h2 { font-size: clamp(1.6rem, 3vw, 2.3rem); }
+    h3 { font-size: clamp(1.18rem, 2vw, 1.4rem); }
+    h4 { font-size: 1.05rem; }
+
+    p {
+      color: var(--text-muted);
+      max-width: 68ch;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+      color: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    svg {
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Focus-Visible Accessibility */
+    :focus-visible {
+      outline: 3px solid var(--focus-ring);
+      outline-offset: 3px;
+    }
+
+    /* Skip Link */
+    .skip-link {
+      position: absolute;
+      top: -120px;
+      left: 16px;
+      z-index: 999;
+      padding: 12px 20px;
+      background: var(--primary);
+      color: var(--text-on-primary);
+      border-radius: var(--radius-pill);
+      font-weight: 700;
+      box-shadow: var(--clay-btn-shadow);
+      transition: top 150ms ease;
+    }
+
+    .skip-link:focus {
+      top: 16px;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Layout Container & Sections */
+    .container {
+      width: 100%;
+      max-width: var(--container-max);
+      margin-inline: auto;
+      padding-inline: 20px;
+    }
+
+    .section {
+      padding-block: 72px;
+      scroll-margin-top: calc(var(--nav-height) + 12px);
+    }
+
+    .section-alt {
+      background-color: var(--bg-alt);
+    }
+
+    .section-header {
+      max-width: 720px;
+      margin-bottom: 40px;
+    }
+
+    .section-header h2::after {
+      content: "";
+      display: block;
+      width: 56px;
+      height: 4px;
+      margin-top: 12px;
+      border-radius: var(--radius-pill);
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      opacity: 0.85;
+    }
+
+    .section-header.centered {
+      margin-inline: auto;
+      text-align: center;
+    }
+
+    .section-header.centered h2::after {
+      margin-inline: auto;
+    }
+
+    .section-header.centered p {
+      margin-inline: auto;
+    }
+
+    .section-header p {
+      margin-top: 14px;
+      font-size: 1.05rem;
+    }
+
+    /* Smooth Section Flow Curves & Hairline Dividers */
+    .section-wave {
+      width: 100%;
+      line-height: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .section-wave svg {
+      display: block;
+      width: 100%;
+      height: 42px;
+    }
+
+    .section-wave--to-alt {
+      background: var(--bg);
+    }
+
+    .section-wave--to-alt .wave-fill {
+      fill: var(--bg-alt);
+    }
+
+    .section-wave--to-base {
+      background: var(--bg-alt);
+    }
+
+    .section-wave--to-base .wave-fill {
+      fill: var(--bg);
+    }
+
+    .section-wave .wave-stroke {
+      fill: none;
+      stroke: var(--line-accent);
+      stroke-width: 1.75;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .smooth-divider {
+      width: 100%;
+      height: 1px;
+      border: 0;
+      margin-block: 44px 0;
+      background: linear-gradient(90deg, transparent, var(--line-soft) 18%, var(--line-soft) 82%, transparent);
+    }
+
+    .card-line-divider {
+      width: 100%;
+      height: 1px;
+      border: 0;
+      margin-block: 16px;
+      background: linear-gradient(90deg, var(--line-soft), transparent);
+    }
+
+    /* =========================================================
+       3. REUSABLE CLAYMORPHISM COMPONENTS
+       ========================================================= */
+    .clay-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--clay-shadow);
+      border: 1px solid var(--border-subtle);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), background-color 250ms ease;
+    }
+
+    .clay-card.interactive:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--clay-shadow-hover);
+    }
+
+    .clay-card--mint { background: var(--surface-mint); }
+    .clay-card--blue { background: var(--surface-blue); }
+    .clay-card--lavender { background: var(--surface-lavender); }
+    .clay-card--peach { background: var(--surface-peach); }
+
+    .clay-panel {
+      background: var(--surface-mint);
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      box-shadow: var(--clay-shadow);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .clay-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: var(--radius-pill);
+      background: var(--surface);
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 0.88rem;
+      letter-spacing: 0.01em;
+      box-shadow: var(--clay-shadow-sm);
+    }
+
+    .clay-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface);
+      color: var(--primary);
+      box-shadow: var(--clay-shadow-sm);
+      margin-bottom: 16px;
+    }
+
+    .clay-icon--accent {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .clay-icon--blue {
+      background: var(--secondary-soft);
+      color: var(--secondary);
+    }
+
+    .clay-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 48px;
+      padding: 12px 24px;
+      border-radius: var(--radius-pill);
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 0.96rem;
+      line-height: 1.2;
+      white-space: nowrap;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
+      box-shadow: var(--clay-shadow-sm);
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .clay-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--clay-shadow);
+    }
+
+    .clay-btn:active {
+      transform: translateY(1px) scale(0.985);
+      box-shadow: var(--clay-inset);
+    }
+
+    .clay-btn--primary {
+      background: var(--primary);
+      color: var(--text-on-primary);
+      box-shadow: var(--clay-btn-shadow);
+    }
+
+    .clay-btn--primary:hover {
+      background: var(--primary-hover);
+      box-shadow: var(--clay-btn-shadow);
+    }
+
+    .clay-btn--accent {
+      background: var(--accent);
+      color: var(--text-on-accent);
+      box-shadow: var(--clay-accent-shadow);
+    }
+
+    .clay-btn--accent:hover {
+      background: var(--accent-hover);
+      box-shadow: var(--clay-accent-shadow);
+    }
+
+    .clay-btn--ghost {
+      background: var(--surface-soft);
+      color: var(--text);
+    }
+
+    .clay-btn--sm {
+      min-height: 44px;
+      padding: 8px 16px;
+      font-size: 0.88rem;
+    }
+
+    .clay-input {
+      width: 100%;
+      min-height: 48px;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface-soft);
+      color: var(--text);
+      font-size: max(1rem, 16px);
+      box-shadow: var(--clay-inset);
+      transition: box-shadow var(--transition-fast), background-color var(--transition-fast);
+    }
+
+    .clay-input::placeholder {
+      color: var(--text-muted);
+      opacity: 0.8;
+    }
+
+    .clay-input:focus {
+      outline: none;
+      background: var(--surface);
+      box-shadow: var(--clay-inset), 0 0 0 3px var(--focus-ring);
+    }
+
+    textarea.clay-input {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    /* Form Field Group */
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field-label {
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: var(--text);
+    }
+
+    .field-error {
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: var(--status-due-text);
+      min-height: 20px;
+    }
+
+    /* =========================================================
+       4. NAVBAR & MOBILE SLIDE-IN CLAY DRAWER
+       ========================================================= */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg);
+      padding-block: 10px;
+      transition: box-shadow 220ms ease, background-color 250ms ease;
+    }
+
+    .site-header.scrolled {
+      box-shadow: 0 10px 28px rgba(19, 54, 58, 0.12);
+    }
+
+    html[data-theme="dark"] .site-header.scrolled {
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+    }
+
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-height: 60px;
+      padding: 8px 18px;
+      border-radius: var(--radius-pill);
+      background: var(--surface);
+      box-shadow: var(--clay-shadow-sm);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 1.18rem;
+      color: var(--text);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: var(--primary);
+      color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--clay-btn-shadow);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      list-style: none;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 8px 12px;
+      border-radius: var(--radius-pill);
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      transition: color var(--transition-fast), background-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .nav-link:hover {
+      color: var(--text);
+      background: var(--surface-soft);
+    }
+
+    .nav-link.active {
+      color: var(--primary);
+      background: var(--primary-soft);
+      box-shadow: var(--clay-shadow-sm);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .icon-toggle-btn {
+      min-width: 44px;
+      min-height: 44px;
+      padding: 8px 12px;
+      border-radius: var(--radius-pill);
+      background: var(--surface-soft);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      box-shadow: var(--clay-shadow-sm);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .icon-toggle-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--clay-shadow);
+    }
+
+    .hamburger-btn {
+      display: none;
+      min-width: 48px;
+      min-height: 48px;
+      padding: 10px 14px;
+      border-radius: var(--radius-pill);
+      background: var(--surface-soft);
+      color: var(--text);
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 0.92rem;
+      box-shadow: var(--clay-shadow-sm);
+    }
+
+    /* Mobile Drawer */
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 32, 36, 0.45);
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 220ms ease;
+    }
+
+    .drawer-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .mobile-drawer {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      bottom: 12px;
+      width: min(360px, calc(100vw - 24px));
+      z-index: 210;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--clay-shadow);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
+      visibility: hidden;
+      transform: translateX(calc(100% + 24px));
+      transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), visibility 260ms ease;
+    }
+
+    .mobile-drawer.open {
+      visibility: visible;
+      transform: translateX(0);
+    }
+
+    .drawer-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .drawer-links {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      list-style: none;
+    }
+
+    .drawer-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 48px;
+      padding: 12px 18px;
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      font-weight: 700;
+      font-size: 1.02rem;
+      color: var(--text);
+      box-shadow: var(--clay-shadow-sm);
+    }
+
+    .drawer-link.active {
+      background: var(--primary-soft);
+      color: var(--primary);
+    }
+
+    .drawer-settings {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 18px;
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      box-shadow: var(--clay-inset);
+    }
+
+    .drawer-setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 0.94rem;
+    }
+
+    /* =========================================================
+       5. HERO SECTION & THREE.JS STAGE
+       ========================================================= */
+    .hero {
+      padding-block: 48px 72px;
+      overflow: hidden;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      align-items: center;
+      gap: 40px;
+    }
+
+    .hero-copy {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+    }
+
+    .hero-copy p.lead {
+      font-size: clamp(1.05rem, 1.8vw, 1.24rem);
+      color: var(--text-muted);
+    }
+
+    .hero-ctas {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 4px;
+    }
+
+    .trust-line {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px 18px;
+      font-size: 0.94rem;
+      font-weight: 700;
+      color: var(--primary);
+      padding-top: 4px;
+    }
+
+    .trust-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* 3D Canvas Stage */
+    .hero-stage {
+      position: relative;
+      height: 460px;
+      border-radius: var(--radius-lg);
+      background: radial-gradient(circle at 55% 45%, var(--surface-mint) 0%, var(--surface-blue) 55%, var(--surface-peach) 100%);
+      box-shadow: var(--clay-shadow);
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: grab;
+      touch-action: pan-y;
+    }
+
+    .hero-canvas:active {
+      cursor: grabbing;
+    }
+
+    .hero-stage-hint {
+      position: absolute;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      background: var(--surface);
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      box-shadow: var(--clay-shadow-sm);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    /* CSS/SVG Fallback if WebGL unavailable */
+    .hero-fallback {
+      display: none;
+      width: 100%;
+      height: 100%;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .hero-fallback.active {
+      display: flex;
+    }
+
+    .fallback-capsules {
+      animation: gentleFloat 4s ease-in-out infinite;
+    }
+
+    @keyframes gentleFloat {
+      0%, 100% { transform: translateY(0px) rotate(-2deg); }
+      50% { transform: translateY(-10px) rotate(2deg); }
+    }
+
+    /* =========================================================
+       6. ABOUT SECTION (PROBLEM STATEMENT, MISSION, VALUES, TEAM)
+       ========================================================= */
+    .problem-panel {
+      background: var(--surface-peach);
+      margin-bottom: 48px;
+    }
+
+    .problem-headline {
+      margin-top: 16px;
+      margin-bottom: 12px;
+      font-size: clamp(1.35rem, 2.5vw, 1.85rem);
+    }
+
+    .pain-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-block: 28px;
+    }
+
+    .pain-card {
+      background: var(--surface);
+      padding: 22px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--clay-shadow-sm);
+    }
+
+    .pain-card h4 {
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .solution-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 20px 24px;
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      box-shadow: var(--clay-shadow-sm);
+    }
+
+    .about-story-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .stat-counters {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .stat-card {
+      text-align: center;
+      padding: 24px 18px;
+    }
+
+    .stat-value {
+      font-family: var(--font-heading);
+      font-size: clamp(1.8rem, 3vw, 2.4rem);
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .stat-label {
+      font-weight: 700;
+      font-size: 0.94rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .subblock-title {
+      margin-top: 32px;
+      margin-bottom: 20px;
+    }
+
+    /* Solo Creator Card */
+    .creator-card {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      max-width: 780px;
+      background: linear-gradient(135deg, var(--surface) 0%, var(--surface-mint) 100%);
+    }
+
+    .creator-avatar {
+      width: 88px;
+      height: 88px;
+      border-radius: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: var(--clay-shadow-sm);
+      background: var(--surface);
+    }
+
+    .creator-info {
+      flex: 1 1 auto;
+    }
+
+    .creator-role {
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 0.94rem;
+      margin-block: 4px 10px;
+    }
+
+    .creator-note {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .illustrative-note {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
+    /* =========================================================
+       7. HOW IT WORKS (CONNECTED BY SMOOTH FLOW LINES)
+       ========================================================= */
+    .steps-flow {
+      position: relative;
+    }
+
+    .steps-flow::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 10%;
+      right: 10%;
+      height: 3px;
+      border-radius: var(--radius-pill);
+      background: linear-gradient(90deg, var(--primary-soft), var(--line-accent), var(--secondary-soft));
+      transform: translateY(-50%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .steps-flow > .clay-card {
+      position: relative;
+      z-index: 1;
+    }
+
+    .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: var(--primary);
+      color: #ffffff;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 1.1rem;
+      box-shadow: var(--clay-btn-shadow);
+      margin-bottom: 16px;
+    }
+
+    /* =========================================================
+       8. MEDICINE TRACKER (CENTERPIECE)
+       ========================================================= */
+    .tracker-layout {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    .tracker-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .tracker-main {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Progress & Summary Row */
+    .tracker-summary {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 24px;
+      background: var(--surface-mint);
+    }
+
+    .ring-wrap {
+      position: relative;
+      width: 112px;
+      height: 112px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .ring-svg {
+      transform: rotate(-90deg);
+      width: 112px;
+      height: 112px;
+    }
+
+    .ring-bg {
+      fill: none;
+      stroke: var(--surface);
+      stroke-width: 10;
+    }
+
+    .ring-fill {
+      fill: none;
+      stroke: var(--primary);
+      stroke-width: 10;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 450ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .ring-text {
+      position: absolute;
+      text-align: center;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: var(--text);
+    }
+
+    .countdown-box {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .countdown-value {
+      font-family: var(--font-heading);
+      font-size: clamp(1.3rem, 2.4vw, 1.7rem);
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .streak-pill {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 20px;
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      box-shadow: var(--clay-shadow-sm);
+      text-align: center;
+      min-width: 110px;
+    }
+
+    .streak-count {
+      font-family: var(--font-heading);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1.1;
+    }
+
+    .celebration-banner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 24px;
+      border-radius: var(--radius-md);
+      background: var(--status-taken-bg);
+      color: var(--status-taken-text);
+      box-shadow: var(--clay-shadow-sm);
+      font-weight: 700;
+      animation: popCelebrate 420ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .celebration-banner.visible {
+      display: flex;
+    }
+
+    @keyframes popCelebrate {
+      0% { transform: scale(0.95); opacity: 0; }
+      70% { transform: scale(1.02); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Schedule List */
+    .schedule-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .schedule-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .med-card {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 18px;
+      padding: 20px 22px;
+    }
+
+    .med-card.is-taken {
+      background: var(--surface-soft);
+    }
+
+    .med-shape-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface-blue);
+      color: var(--secondary);
+      box-shadow: var(--clay-shadow-sm);
+    }
+
+    .med-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px 14px;
+      margin-top: 6px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: var(--radius-pill);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .status-badge--upcoming {
+      background: var(--status-upcoming-bg);
+      color: var(--status-upcoming-text);
+    }
+
+    .status-badge--due {
+      background: var(--status-due-bg);
+      color: var(--status-due-text);
+    }
+
+    .status-badge--taken {
+      background: var(--status-taken-bg);
+      color: var(--status-taken-text);
+    }
+
+    .med-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .icon-action-btn {
+      min-width: 44px;
+      min-height: 44px;
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface-soft);
+      color: var(--text-muted);
+      box-shadow: var(--clay-shadow-sm);
+      transition: transform var(--transition-fast), color var(--transition-fast);
+    }
+
+    .icon-action-btn:hover {
+      transform: translateY(-1px);
+      color: var(--text);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    /* Wellness Widgets: Water & BMI */
+    .wellness-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .water-cups {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-block: 16px;
+    }
+
+    .water-cup {
+      width: 28px;
+      height: 34px;
+      border-radius: 6px 6px 10px 10px;
+      background: var(--surface-soft);
+      box-shadow: var(--clay-inset);
+      position: relative;
+      overflow: hidden;
+      transition: transform var(--transition-fast);
+    }
+
+    .water-cup.filled {
+      background: var(--secondary);
+      box-shadow: var(--clay-shadow-sm);
+      transform: translateY(-2px);
+    }
+
+    .water-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .bmi-form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-block: 14px;
+    }
+
+    .bmi-result {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      box-shadow: var(--clay-inset);
+    }
+
+    .privacy-note-box {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 16px 20px;
+      border-radius: var(--radius-md);
+      background: var(--surface-blue);
+      box-shadow: var(--clay-shadow-sm);
+      font-size: 0.92rem;
+    }
+
+    /* =========================================================
+       9. DOCTORS DIRECTORY & HEALTH TIPS
+       ========================================================= */
+    .doctor-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 24px;
+      align-items: center;
+    }
+
+    .doctor-search-wrap {
+      flex: 1 1 280px;
+      position: relative;
+    }
+
+    .filter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter-chip {
+      min-height: 44px;
+      padding: 8px 16px;
+      border-radius: var(--radius-pill);
+      background: var(--surface);
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 0.88rem;
+      box-shadow: var(--clay-shadow-sm);
+      transition: background-color var(--transition-fast), color var(--transition-fast);
+    }
+
+    .filter-chip[aria-pressed="true"] {
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: var(--clay-btn-shadow);
+    }
+
+    .doctor-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .tips-grid {
+      margin-top: 40px;
+    }
+
+    /* =========================================================
+       10. FAQ ACCORDION
+       ========================================================= */
+    .faq-list {
+      max-width: 820px;
+      margin-inline: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .faq-item {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .faq-trigger {
+      width: 100%;
+      min-height: 60px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      text-align: left;
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 1.06rem;
+      color: var(--text);
+    }
+
+    .faq-chevron {
+      transition: transform 220ms ease;
+    }
+
+    .faq-trigger[aria-expanded="true"] .faq-chevron {
+      transform: rotate(180deg);
+    }
+
+    .faq-panel {
+      padding: 0 24px 22px;
+      color: var(--text-muted);
+    }
+
+    .faq-panel[hidden] {
+      display: none;
+    }
+
+    /* =========================================================
+       11. CONTACT & FOOTER
+       ========================================================= */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    .contact-info-list {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      margin-top: 20px;
+    }
+
+    .contact-info-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .site-footer {
+      background: var(--surface);
+      padding-block: 56px 36px;
+      box-shadow: 0 -8px 24px rgba(19, 54, 58, 0.06);
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      gap: 32px;
+      margin-bottom: 32px;
+    }
+
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      font-weight: 600;
+      display: inline-block;
+      padding-block: 4px;
+    }
+
+    .footer-links a:hover {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+
+    .social-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .disclaimer-box {
+      padding: 18px 22px;
+      border-radius: var(--radius-md);
+      background: var(--surface-peach);
+      color: var(--text);
+      font-size: 0.92rem;
+      font-weight: 700;
+      box-shadow: var(--clay-shadow-sm);
+      margin-bottom: 20px;
+    }
+
+    .footer-bottom {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    /* =========================================================
+       12. TOAST NOTIFICATION & SCROLL REVEAL
+       ========================================================= */
+    .toast-region {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 300;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: min(380px, calc(100vw - 32px));
+    }
+
+    .toast {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      background: var(--text);
+      color: var(--surface);
+      font-weight: 700;
+      font-size: 0.94rem;
+      box-shadow: var(--clay-shadow);
+      animation: slideInToast 240ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .toast--success {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    .toast--error {
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    @keyframes slideInToast {
+      from { transform: translateY(16px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Scroll Reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 520ms cubic-bezier(0.22, 1, 0.36, 1), transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .reveal.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* =========================================================
+       13. RESPONSIVE BREAKPOINTS & REDUCED MOTION
+       ========================================================= */
+    @media (max-width: 1080px) {
+      .tracker-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 920px) {
+      .nav-links,
+      .nav-desktop-controls {
+        display: none;
+      }
+      .hamburger-btn {
+        display: inline-flex;
+      }
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 28px;
+      }
+      .hero-stage {
+        height: 310px;
+      }
+      .pain-grid,
+      .grid-3,
+      .stat-counters,
+      .about-story-grid,
+      .wellness-grid,
+      .contact-grid,
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+      .steps-flow::before {
+        top: 12%;
+        bottom: 12%;
+        left: 50%;
+        right: auto;
+        width: 3px;
+        height: auto;
+        transform: translateX(-50%);
+        background: linear-gradient(180deg, var(--primary-soft), var(--line-accent), var(--secondary-soft));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .section {
+        padding-block: 48px;
+      }
+      .clay-card,
+      .clay-panel {
+        padding: 20px;
+        border-radius: 22px;
+      }
+      .creator-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 18px;
+      }
+      .section-wave svg {
+        height: 28px;
+      }
+      .tracker-summary {
+        grid-template-columns: 1fr;
+        justify-items: start;
+      }
+      .med-card {
+        grid-template-columns: 1fr;
+      }
+      .med-actions {
+        width: 100%;
+      }
+      .med-actions .clay-btn--primary,
+      .med-actions .clay-btn--ghost {
+        flex: 1 1 auto;
+      }
+      .grid-2,
+      .bmi-form-row {
+        grid-template-columns: 1fr;
+      }
+      .hero-stage {
+        height: 290px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .reveal {
+        opacity: 1;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- =========================================================
+       STICKY CLAY NAVBAR
+       ========================================================= -->
+  <header class="site-header" id="site-header">
+    <div class="container">
+      <nav class="navbar" aria-label="Main navigation">
+        <a href="#home" class="brand" aria-label="CalmDose Home">
+          <span class="brand-mark" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.5 20.5 3.5 13.5a4.95 4.95 0 1 1 7-7l7 7a4.95 4.95 0 1 1-7 7Z" />
+              <path d="M8.5 8.5 15.5 15.5" />
+            </svg>
+          </span>
+          <span>CalmDose</span>
+        </a>
+
+        <ul class="nav-links" role="menubar">
+          <li role="none"><a role="menuitem" class="nav-link active" href="#home">Home</a></li>
+          <li role="none"><a role="menuitem" class="nav-link" href="#about">About</a></li>
+          <li role="none"><a role="menuitem" class="nav-link" href="#how-it-works">How It Works</a></li>
+          <li role="none"><a role="menuitem" class="nav-link" href="#tracker">Tracker</a></li>
+          <li role="none"><a role="menuitem" class="nav-link" href="#services">Services</a></li>
+          <li role="none"><a role="menuitem" class="nav-link" href="#faq">FAQ</a></li>
+          <li role="none"><a role="menuitem" class="nav-link" href="#contact">Contact</a></li>
+        </ul>
+
+        <div class="nav-actions nav-desktop-controls">
+          <button type="button" class="icon-toggle-btn" id="theme-toggle" aria-label="Switch to dark mode" aria-pressed="false">
+            <svg class="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+            </svg>
+            <svg class="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none">
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+            </svg>
+            <span class="sr-only" id="theme-toggle-label">Toggle dark mode</span>
+          </button>
+
+          <a href="#tracker" class="clay-btn clay-btn--accent clay-btn--sm">Get Started</a>
+        </div>
+
+        <button
+          type="button"
+          class="hamburger-btn"
+          id="menu-toggle"
+          aria-expanded="false"
+          aria-controls="mobile-drawer"
+          aria-label="Open navigation menu"
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
+            <line x1="4" y1="7" x2="20" y2="7" />
+            <line x1="4" y1="12" x2="20" y2="12" />
+            <line x1="4" y1="17" x2="20" y2="17" />
+          </svg>
+          <span>Menu</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Mobile Slide-in Clay Drawer -->
+  <div class="drawer-backdrop" id="drawer-backdrop" aria-hidden="true"></div>
+  <aside
+    class="mobile-drawer"
+    id="mobile-drawer"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Mobile navigation menu"
+    aria-hidden="true"
+  >
+    <div class="drawer-head">
+      <span class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.5 20.5 3.5 13.5a4.95 4.95 0 1 1 7-7l7 7a4.95 4.95 0 1 1-7 7Z" />
+            <path d="M8.5 8.5 15.5 15.5" />
+          </svg>
+        </span>
+        CalmDose
+      </span>
+      <button type="button" class="clay-btn clay-btn--ghost clay-btn--sm" id="drawer-close" aria-label="Close navigation menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
+          <path d="M18 6 6 18M6 6l12 12" />
+        </svg>
+        Close
+      </button>
+    </div>
+
+    <ul class="drawer-links">
+      <li><a class="drawer-link" href="#home">Home <span aria-hidden="true">&rarr;</span></a></li>
+      <li><a class="drawer-link" href="#about">About Us <span aria-hidden="true">&rarr;</span></a></li>
+      <li><a class="drawer-link" href="#how-it-works">How It Works <span aria-hidden="true">&rarr;</span></a></li>
+      <li><a class="drawer-link" href="#tracker">Medicine Tracker <span aria-hidden="true">&rarr;</span></a></li>
+      <li><a class="drawer-link" href="#services">Services <span aria-hidden="true">&rarr;</span></a></li>
+      <li><a class="drawer-link" href="#doctors">Doctors &amp; Tips <span aria-hidden="true">&rarr;</span></a></li>
+      <li><a class="drawer-link" href="#faq">FAQ <span aria-hidden="true">&rarr;</span></a></li>
+      <li><a class="drawer-link" href="#contact">Contact <span aria-hidden="true">&rarr;</span></a></li>
+    </ul>
+
+    <div class="drawer-settings">
+      <div class="drawer-setting-row">
+        <span>Appearance</span>
+        <button type="button" class="icon-toggle-btn" id="drawer-theme-toggle" aria-label="Switch to dark mode" aria-pressed="false">
+          <svg class="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+          </svg>
+          <svg class="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+          </svg>
+          <span id="drawer-theme-text">Dark mode</span>
+        </button>
+      </div>
+    </div>
+
+    <a href="#tracker" class="clay-btn clay-btn--accent drawer-cta">Get Started</a>
+  </aside>
+
+  <main id="main-content">
+    <!-- =========================================================
+         HERO SECTION + THREE.JS 3D MEDICINE
+         ========================================================= -->
+    <section id="home" class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <h1>Never miss a dose again.</h1>
+          <p class="lead">
+            A calm, clear daily medicine companion built for every age—helping families, busy adults, and older loved ones stay on schedule without confusing menus.
+          </p>
+
+          <div class="hero-ctas">
+            <a href="#tracker" class="clay-btn clay-btn--accent">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="4" width="18" height="18" rx="4" />
+                <path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4" />
+              </svg>
+              Open Medicine Tracker
+            </a>
+            <a href="#about" class="clay-btn clay-btn--ghost">
+              Learn more
+            </a>
+          </div>
+
+          <div class="trust-line" aria-label="Key assurances">
+            <span class="trust-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+              Free
+            </span>
+            <span aria-hidden="true">|</span>
+            <span class="trust-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>
+              Simple to use
+            </span>
+            <span aria-hidden="true">|</span>
+            <span class="trust-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Your data stays on your device
+            </span>
+          </div>
+        </div>
+
+        <div
+          class="hero-stage"
+          id="hero-stage"
+          role="region"
+          aria-label="Interactive 3D illustration showing floating two-tone medicine capsules, round tablets, and a medicine bottle with a medical plus sign"
+        >
+          <canvas id="medicine-canvas" class="hero-canvas" aria-hidden="true"></canvas>
+
+          <!-- Graceful CSS/SVG Fallback if WebGL or Three.js fails -->
+          <div class="hero-fallback" id="hero-fallback" aria-hidden="true">
+            <svg class="fallback-capsules" width="240" height="180" viewBox="0 0 240 180" fill="none">
+              <g transform="rotate(-22 74 78)">
+                <rect x="34" y="58" width="80" height="36" rx="18" fill="#0d6e66" />
+                <path d="M74 58h22a18 18 0 0 1 0 36H74V58Z" fill="#ffffff" />
+              </g>
+              <g transform="rotate(18 164 64)">
+                <rect x="130" y="48" width="68" height="30" rx="15" fill="#c44d34" />
+                <path d="M164 48h19a15 15 0 0 1 0 30h-19V48Z" fill="#fcece5" />
+              </g>
+              <circle cx="110" cy="134" r="22" fill="#dcebfa" stroke="#2b6cb0" stroke-width="3" />
+              <line x1="94" y1="134" x2="126" y2="134" stroke="#2b6cb0" stroke-width="3" stroke-linecap="round" />
+              <rect x="155" y="102" width="46" height="58" rx="12" fill="#e3f4ef" stroke="#0d6e66" stroke-width="3" />
+              <rect x="163" y="90" width="30" height="14" rx="5" fill="#0d6e66" />
+              <path d="M178 122v18M169 131h18" stroke="#c44d34" stroke-width="4" stroke-linecap="round" />
+            </svg>
+            <p style="font-weight:700; color:var(--text);">Gentle daily reminders for every routine</p>
+          </div>
+
+          <span class="hero-stage-hint" id="stage-hint">Tap any 3D capsule or tablet to spin</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-wave section-wave--to-alt" aria-hidden="true">
+      <svg viewBox="0 0 1440 48" preserveAspectRatio="none">
+        <path class="wave-fill" d="M0,24 C320,48 640,0 960,24 C1180,40 1320,34 1440,18 L1440,48 L0,48 Z"></path>
+        <path class="wave-stroke" d="M0,24 C320,48 640,0 960,24 C1180,40 1320,34 1440,18"></path>
+      </svg>
+    </div>
+
+    <!-- =========================================================
+         ABOUT US SECTION (PROBLEM STATEMENT FIRST)
+         ========================================================= -->
+    <section id="about" class="section section-alt">
+      <div class="container">
+        <div class="section-header reveal">
+          <h2>About CalmDose</h2>
+          <p>Designed around real everyday life so caring for your health—or helping someone you love—feels calm and effortless.</p>
+        </div>
+
+        <!-- a. PROBLEM STATEMENT (Highlighted Clay Panel) -->
+        <div class="clay-panel problem-panel reveal" aria-labelledby="problem-heading">
+          <span class="clay-pill">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 8v4M12 16h.01" />
+            </svg>
+            The Problem
+          </span>
+
+          <h3 id="problem-heading" class="problem-headline">
+            Millions of people miss or mistime their medicines, and confusing health tools make everyday care harder than it should be.
+          </h3>
+
+          <p>
+            Parents managing a child's short-term syrup, working adults rushing through busy mornings, and older adults balancing several daily pills all run into the same hurdle: doses get forgotten or taken late because paper lists get lost and most apps are crowded with tiny text and complex setups. When medicines are missed or mistimed, recovery slows down, hospital visits become more likely, and families carry unnecessary worry every single day.
+          </p>
+
+          <div class="pain-grid">
+            <div class="pain-card">
+              <h4>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Easy to forget
+              </h4>
+              <p>Busy schedules and shifting meal times make a single morning or evening dose easy to overlook.</p>
+            </div>
+
+            <div class="pain-card">
+              <h4>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                Hard to keep track
+              </h4>
+              <p>Sticky notes and separate phone alarms leave caregivers unsure whether today's pill was already taken.</p>
+            </div>
+
+            <div class="pain-card">
+              <h4>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                No simple tool for all ages
+              </h4>
+              <p>Crowded screens, mandatory logins, and medical jargon push older users and teens away from daily tracking.</p>
+            </div>
+          </div>
+
+          <div class="solution-bar">
+            <p style="color:var(--text); font-weight:700;">
+              <strong>Our Solution:</strong> CalmDose turns daily medicine routines into one large, friendly checklist right in your browser—ready in seconds with zero accounts.
+            </p>
+            <a href="#tracker" class="clay-btn clay-btn--primary">Go to Tracker</a>
+          </div>
+        </div>
+
+        <!-- Animated Product Truth Counters -->
+        <div class="stat-counters reveal" aria-label="CalmDose design commitments">
+          <div class="clay-card stat-card">
+            <div class="stat-value tabular-nums" data-counter="100" data-suffix="%">100%</div>
+            <div class="stat-label">Stored locally in your browser</div>
+          </div>
+          <div class="clay-card stat-card">
+            <div class="stat-value tabular-nums" data-counter="3" data-suffix=" Steps">3 Steps</div>
+            <div class="stat-label">To set up today's schedule</div>
+          </div>
+          <div class="clay-card stat-card">
+            <div class="stat-value tabular-nums" data-counter="0" data-suffix=" Accounts">0 Accounts</div>
+            <div class="stat-label">No sign-ups or passwords needed</div>
+          </div>
+        </div>
+
+        <!-- b. Mission & c. Story -->
+        <div class="about-story-grid reveal">
+          <article class="clay-card clay-card--mint">
+            <h3>Our Mission</h3>
+            <p style="margin-top:10px;">
+              We believe caring for your daily health should feel reassuring, calm, and clear at every age. Our mission is to give individuals and families an accessible, private space to follow daily medicine routines without confusion.
+            </p>
+          </article>
+
+          <article class="clay-card clay-card--blue">
+            <h3>Our Story</h3>
+            <p style="margin-top:10px;">
+              CalmDose began after seeing how hard it can be to juggle paper pill charts and complicated phone apps that require accounts just to log a morning vitamin. Kenedy Duwarah built this single, readable page with large buttons, plain words, and complete privacy—so anyone from a teenager to a grandparent can use it comfortably on day one.
+            </p>
+          </article>
+        </div>
+
+        <hr class="smooth-divider" aria-hidden="true" />
+
+        <!-- d. Three Core Values -->
+        <h3 class="subblock-title reveal">Our Core Values</h3>
+        <div class="grid-3 reveal">
+          <article class="clay-card interactive">
+            <div class="clay-icon clay-icon--accent" aria-hidden="true">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+            </div>
+            <h4>Care</h4>
+            <p style="margin-top:8px;">Respectful, gentle language that supports healthy habits without alarm or guilt.</p>
+          </article>
+
+          <article class="clay-card interactive">
+            <div class="clay-icon" aria-hidden="true">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>
+            </div>
+            <h4>Simplicity</h4>
+            <p style="margin-top:8px;">Large, readable text, clear buttons, and high-contrast light and dark modes.</p>
+          </article>
+
+          <article class="clay-card interactive">
+            <div class="clay-icon clay-icon--blue" aria-hidden="true">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <h4>Privacy</h4>
+            <p style="margin-top:8px;">Your medicine list and daily check-ins never leave your own device.</p>
+          </article>
+        </div>
+
+        <hr class="smooth-divider" aria-hidden="true" />
+
+        <!-- e. Who Is This For? -->
+        <h3 class="subblock-title reveal">Who Is This For?</h3>
+        <div class="grid-3 reveal">
+          <article class="clay-card clay-card--lavender">
+            <h4>Children &amp; Parents</h4>
+            <p style="margin-top:8px;">Keep track of short-term syrups, allergy drops, or daily vitamins during busy school weeks.</p>
+          </article>
+
+          <article class="clay-card clay-card--mint">
+            <h4>Working Adults</h4>
+            <p style="margin-top:8px;">See what is due next at a glance between meetings, commutes, and family meals.</p>
+          </article>
+
+          <article class="clay-card clay-card--peach">
+            <h4>Seniors &amp; Caregivers</h4>
+            <p style="margin-top:8px;">Large touch targets, high-contrast labels, and clear "Taken" confirmation to prevent double doses.</p>
+          </article>
+        </div>
+
+        <hr class="smooth-divider" aria-hidden="true" />
+
+        <!-- f. Solo Creator Block -->
+        <h3 class="subblock-title reveal">Created By</h3>
+        <article class="clay-card creator-card reveal">
+          <div class="creator-avatar" aria-hidden="true">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+              <circle cx="24" cy="17" r="8.5" fill="#0d6e66" />
+              <path d="M10 40c0-7.732 6.268-13 14-13s14 5.268 14 13" fill="#81c7bd" />
+            </svg>
+          </div>
+          <div class="creator-info">
+            <h4>Kenedy Duwarah</h4>
+            <p class="creator-role">Founder &amp; Developer</p>
+            <p>
+              Designed and built CalmDose independently so people of every age—from teenagers to older loved ones—can track daily medicines in a calm, readable space with zero clutter or sign-ups.
+            </p>
+            <hr class="card-line-divider" aria-hidden="true" />
+            <p class="creator-note">Solo project &middot; Built for clarity, accessibility, and local-only privacy.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <div class="section-wave section-wave--to-base" aria-hidden="true">
+      <svg viewBox="0 0 1440 48" preserveAspectRatio="none">
+        <path class="wave-fill" d="M0,20 C280,0 600,46 940,22 C1160,6 1320,16 1440,30 L1440,48 L0,48 Z"></path>
+        <path class="wave-stroke" d="M0,20 C280,0 600,46 940,22 C1160,6 1320,16 1440,30"></path>
+      </svg>
+    </div>
+
+    <!-- =========================================================
+         HOW IT WORKS SECTION
+         ========================================================= -->
+    <section id="how-it-works" class="section">
+      <div class="container">
+        <div class="section-header centered reveal">
+          <h2>How It Works</h2>
+          <p>Three simple steps to build a calm daily routine—no account or setup wizard required.</p>
+        </div>
+
+        <div class="grid-3 steps-flow reveal">
+          <article class="clay-card clay-card--mint interactive">
+            <span class="step-number">1</span>
+            <h3>Add Your Medicine</h3>
+            <p style="margin-top:10px;">Type the medicine name, dose, and time of day, then choose capsule, tablet, or syrup.</p>
+          </article>
+
+          <article class="clay-card clay-card--blue interactive">
+            <span class="step-number">2</span>
+            <h3>See What Is Next</h3>
+            <p style="margin-top:10px;">Your schedule sorts itself by time with a live countdown to your next dose and clear status labels.</p>
+          </article>
+
+          <article class="clay-card clay-card--peach interactive">
+            <span class="step-number">3</span>
+            <h3>Mark Taken &amp; Stay Steady</h3>
+            <p style="margin-top:10px;">Tap the large "Mark as taken" button, watch your progress ring fill, and build your daily streak.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-wave section-wave--to-alt" aria-hidden="true">
+      <svg viewBox="0 0 1440 48" preserveAspectRatio="none">
+        <path class="wave-fill" d="M0,24 C320,48 640,0 960,24 C1180,40 1320,34 1440,18 L1440,48 L0,48 Z"></path>
+        <path class="wave-stroke" d="M0,24 C320,48 640,0 960,24 C1180,40 1320,34 1440,18"></path>
+      </svg>
+    </div>
+
+    <!-- =========================================================
+         MEDICINE REMINDER & PILL TRACKER (CENTERPIECE)
+         ========================================================= -->
+    <section id="tracker" class="section section-alt">
+      <div class="container">
+        <div class="section-header reveal">
+          <h2>Your Daily Medicine Tracker</h2>
+          <p>Everything is saved automatically in your browser. Try marking a sample medicine as taken, or add your own below.</p>
+        </div>
+
+        <div class="tracker-layout">
+          <!-- Left Sidebar: Add / Edit Medicine Form + Privacy Note -->
+          <div class="tracker-sidebar">
+            <form id="medicine-form" class="clay-card" novalidate aria-labelledby="med-form-title">
+              <h3 id="med-form-title">Add a Medicine</h3>
+              <input type="hidden" id="med-edit-id" value="" />
+
+              <div class="field-group" style="margin-top:16px;">
+                <label class="field-label" for="med-name">Medicine name</label>
+                <input class="clay-input" type="text" id="med-name" placeholder="e.g., Vitamin D3" required />
+                <span class="field-error" id="err-med-name" role="alert"></span>
+              </div>
+
+              <div class="field-group" style="margin-top:10px;">
+                <label class="field-label" for="med-dose">Dose &amp; note</label>
+                <input class="clay-input" type="text" id="med-dose" placeholder="e.g., 1 capsule with breakfast" required />
+                <span class="field-error" id="err-med-dose" role="alert"></span>
+              </div>
+
+              <div class="field-group" style="margin-top:10px;">
+                <label class="field-label" for="med-time">Scheduled time</label>
+                <input class="clay-input" type="time" id="med-time" required />
+                <span class="field-error" id="err-med-time" role="alert"></span>
+              </div>
+
+              <div class="field-group" style="margin-top:10px;">
+                <label class="field-label" for="med-shape">Medicine form</label>
+                <select class="clay-input" id="med-shape">
+                  <option value="capsule">Capsule</option>
+                  <option value="tablet">Tablet</option>
+                  <option value="syrup">Syrup / Liquid</option>
+                </select>
+              </div>
+
+              <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:18px;">
+                <button type="submit" class="clay-btn clay-btn--primary" id="med-submit-btn" style="flex:1 1 auto;">
+                  Save Medicine
+                </button>
+                <button type="button" class="clay-btn clay-btn--ghost" id="med-cancel-edit" hidden>
+                  Cancel
+                </button>
+              </div>
+            </form>
+
+            <div class="privacy-note-box" role="note">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="11" width="18" height="11" rx="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+              <p style="font-size:0.9rem; color:var(--text);">
+                <strong>100% Local Privacy:</strong> All medicine names, times, water counts, and streaks stay in your own browser. Nothing is sent to any server.
+              </p>
+            </div>
+          </div>
+
+          <!-- Right Main Column: Summary, Schedule, Water & BMI -->
+          <div class="tracker-main">
+            <!-- Progress Ring, Live Countdown & Streak -->
+            <div class="clay-card tracker-summary">
+              <div class="ring-wrap" aria-label="Today's medicine completion">
+                <svg class="ring-svg" viewBox="0 0 120 120" aria-hidden="true">
+                  <circle class="ring-bg" cx="60" cy="60" r="50"></circle>
+                  <circle class="ring-fill" id="progress-ring-circle" cx="60" cy="60" r="50" stroke-dasharray="314.16" stroke-dashoffset="314.16"></circle>
+                </svg>
+                <div class="ring-text tabular-nums" id="progress-ring-label">0%</div>
+              </div>
+
+              <div class="countdown-box" aria-live="polite">
+                <span style="font-weight:700; font-size:0.9rem; color:var(--text-muted);" id="progress-subtext">0 of 0 doses taken today</span>
+                <div class="countdown-value tabular-nums" id="next-dose-countdown">Checking schedule...</div>
+                <span style="font-size:0.92rem; color:var(--text-muted);" id="next-dose-detail"></span>
+              </div>
+
+              <div class="streak-pill" aria-label="Daily completion streak">
+                <span class="streak-count tabular-nums" id="streak-value">1</span>
+                <span style="font-size:0.84rem; font-weight:800; color:var(--text-muted);">Day Streak</span>
+              </div>
+            </div>
+
+            <!-- Celebration Banner when all doses taken -->
+            <div class="celebration-banner" id="celebration-banner" role="status" aria-live="polite">
+              <span style="display:flex; align-items:center; gap:10px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                Wonderful job! All of today's medicines are marked as taken.
+              </span>
+            </div>
+
+            <!-- Today's Schedule -->
+            <div class="clay-card">
+              <div class="schedule-header">
+                <h3>Today's Schedule</h3>
+                <button type="button" class="clay-btn clay-btn--ghost clay-btn--sm" id="reset-demo-btn">
+                  Reset demo data
+                </button>
+              </div>
+
+              <div class="schedule-list" id="schedule-list" style="margin-top:18px;">
+                <!-- Rendered by JavaScript -->
+              </div>
+            </div>
+
+            <!-- Water Intake Counter & BMI Check -->
+            <div class="wellness-grid">
+              <!-- Water Counter -->
+              <article class="clay-card clay-card--blue" aria-labelledby="water-title">
+                <h3 id="water-title">Daily Water Intake</h3>
+                <p style="margin-top:4px; font-size:0.94rem;">Staying hydrated helps you take pills comfortably.</p>
+
+                <div style="margin-top:12px; font-family:var(--font-heading); font-weight:700; font-size:1.3rem;" class="tabular-nums">
+                  <span id="water-count">4</span> / 8 glasses today
+                </div>
+
+                <div class="water-cups" id="water-cups" aria-hidden="true"></div>
+
+                <div class="water-controls">
+                  <button type="button" class="clay-btn clay-btn--ghost clay-btn--sm" id="water-minus" aria-label="Remove one glass of water">- 1 Glass</button>
+                  <button type="button" class="clay-btn clay-btn--primary clay-btn--sm" id="water-plus" aria-label="Add one glass of water">+ 1 Glass</button>
+                </div>
+              </article>
+
+              <!-- Informational BMI Calculator -->
+              <article class="clay-card clay-card--lavender" aria-labelledby="bmi-title">
+                <h3 id="bmi-title">Quick BMI Check</h3>
+                <p style="margin-top:4px; font-size:0.94rem;">A simple number check using metric units.</p>
+
+                <form id="bmi-form" novalidate>
+                  <div class="bmi-form-row">
+                    <div class="field-group">
+                      <label class="field-label" for="bmi-height">Height (cm)</label>
+                      <input class="clay-input tabular-nums" type="number" id="bmi-height" min="80" max="250" step="1" placeholder="170" value="170" required />
+                    </div>
+                    <div class="field-group">
+                      <label class="field-label" for="bmi-weight">Weight (kg)</label>
+                      <input class="clay-input tabular-nums" type="number" id="bmi-weight" min="20" max="300" step="0.5" placeholder="68" value="68" required />
+                    </div>
+                  </div>
+                  <button type="submit" class="clay-btn clay-btn--primary clay-btn--sm">Calculate BMI</button>
+                </form>
+
+                <div class="bmi-result" id="bmi-result" aria-live="polite">
+                  <strong class="tabular-nums">BMI: 23.5</strong> — General reference range (18.5–24.9)
+                </div>
+                <p class="illustrative-note">
+                  Informational only. BMI does not measure personal health—please consult your doctor for medical guidance.
+                </p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-wave section-wave--to-base" aria-hidden="true">
+      <svg viewBox="0 0 1440 48" preserveAspectRatio="none">
+        <path class="wave-fill" d="M0,20 C280,0 600,46 940,22 C1160,6 1320,16 1440,30 L1440,48 L0,48 Z"></path>
+        <path class="wave-stroke" d="M0,20 C280,0 600,46 940,22 C1160,6 1320,16 1440,30"></path>
+      </svg>
+    </div>
+
+    <!-- =========================================================
+         SERVICES / FEATURES SECTION
+         ========================================================= -->
+    <section id="services" class="section">
+      <div class="container">
+        <div class="section-header centered reveal">
+          <h2>Everything Included</h2>
+          <p>Six thoughtful tools designed with gentle colors, readable text, and zero clutter.</p>
+        </div>
+
+        <div class="grid-3 reveal">
+          <article class="clay-card interactive">
+            <div class="clay-icon" aria-hidden="true">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            </div>
+            <h3>Medicine Reminders</h3>
+            <p style="margin-top:8px;">Clear daily cards sorted by time, with a live countdown so you always know what comes next.</p>
+          </article>
+
+          <article class="clay-card interactive">
+            <div class="clay-icon clay-icon--accent" aria-hidden="true">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            </div>
+            <h3>Daily Health Tips</h3>
+            <p style="margin-top:8px;">Short, plain-language habits on safe storage, consistent timing, and everyday comfort.</p>
+          </article>
+
+          <article class="clay-card interactive">
+            <div class="clay-icon clay-icon--blue" aria-hidden="true">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+            </div>
+            <h3>Water Tracker</h3>
+            <p style="margin-top:8px;">One-tap glass counter to support hydration alongside your morning and evening pills.</p>
+          </article>
+
+          <article class="clay-card interactive">
+            <div class="clay-icon" aria-hidden="true">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+            </div>
+            <h3>BMI Check</h3>
+            <p style="margin-top:8px;">Quick reference calculator with clear disclaimers and friendly everyday language.</p>
+          </article>
+
+          <article class="clay-card interactive">
+            <div class="clay-icon clay-icon--accent" aria-hidden="true">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/><path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/><circle cx="20" cy="10" r="2"/></svg>
+            </div>
+            <h3>Find a Doctor</h3>
+            <p style="margin-top:8px;">Search a sample directory by specialty or city whenever you want to look up care options.</p>
+          </article>
+
+          <article class="clay-card interactive">
+            <div class="clay-icon clay-icon--blue" aria-hidden="true">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <h3>Privacy First</h3>
+            <p style="margin-top:8px;">Zero tracking cookies, zero servers, and instant demo reset whenever you share a device.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-wave section-wave--to-alt" aria-hidden="true">
+      <svg viewBox="0 0 1440 48" preserveAspectRatio="none">
+        <path class="wave-fill" d="M0,24 C320,48 640,0 960,24 C1180,40 1320,34 1440,18 L1440,48 L0,48 Z"></path>
+        <path class="wave-stroke" d="M0,24 C320,48 640,0 960,24 C1180,40 1320,34 1440,18"></path>
+      </svg>
+    </div>
+
+    <!-- =========================================================
+         FIND A DOCTOR & HEALTH TIPS SECTION
+         ========================================================= -->
+    <section id="doctors" class="section section-alt">
+      <div class="container">
+        <div class="section-header reveal">
+          <h2>Find a Doctor &amp; Daily Health Tips</h2>
+          <p>Browse our sample clinic directory by name, city, or specialty, and read three gentle everyday reminders.</p>
+        </div>
+
+        <div class="doctor-controls reveal">
+          <div class="doctor-search-wrap">
+            <label for="doctor-search" class="sr-only">Search doctors by name, specialty, or city</label>
+            <input
+              type="search"
+              id="doctor-search"
+              class="clay-input"
+              placeholder="Search by doctor name, specialty, or city..."
+            />
+          </div>
+
+          <div class="filter-chips" role="group" aria-label="Filter doctors by specialty">
+            <button type="button" class="filter-chip" data-specialty="all" aria-pressed="true">All</button>
+            <button type="button" class="filter-chip" data-specialty="Family Medicine" aria-pressed="false">Family Medicine</button>
+            <button type="button" class="filter-chip" data-specialty="Pediatrics" aria-pressed="false">Pediatrics</button>
+            <button type="button" class="filter-chip" data-specialty="Geriatrics" aria-pressed="false">Geriatrics</button>
+            <button type="button" class="filter-chip" data-specialty="Cardiology" aria-pressed="false">Cardiology</button>
+          </div>
+        </div>
+
+        <div class="grid-3 reveal" id="doctor-grid">
+          <!-- Populated by JavaScript -->
+        </div>
+        <p class="illustrative-note">Sample directory listings shown for demonstration purposes only.</p>
+
+        <hr class="smooth-divider" aria-hidden="true" />
+
+        <h3 class="subblock-title reveal">Three Gentle Health Tips</h3>
+        <div class="grid-3 tips-grid reveal">
+          <article class="clay-card clay-card--mint">
+            <h4>Pair pills with an existing habit</h4>
+            <p style="margin-top:8px;">Linking a morning capsule to brushing your teeth or making tea makes routines easier to remember naturally.</p>
+          </article>
+
+          <article class="clay-card clay-card--blue">
+            <h4>Keep medicines in a cool, dry spot</h4>
+            <p style="margin-top:8px;">Bathroom cabinets can get steamy. A dry bedroom drawer or kitchen shelf away from sunlight helps protect tablets.</p>
+          </article>
+
+          <article class="clay-card clay-card--peach">
+            <h4>Ask before splitting or skipping</h4>
+            <p style="margin-top:8px;">If a pill feels hard to swallow or causes discomfort, ask your pharmacist or doctor before changing the dose.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-wave section-wave--to-base" aria-hidden="true">
+      <svg viewBox="0 0 1440 48" preserveAspectRatio="none">
+        <path class="wave-fill" d="M0,20 C280,0 600,46 940,22 C1160,6 1320,16 1440,30 L1440,48 L0,48 Z"></path>
+        <path class="wave-stroke" d="M0,20 C280,0 600,46 940,22 C1160,6 1320,16 1440,30"></path>
+      </svg>
+    </div>
+
+    <!-- =========================================================
+         FAQ SECTION (ACCESSIBLE ACCORDION)
+         ========================================================= -->
+    <section id="faq" class="section">
+      <div class="container">
+        <div class="section-header centered reveal">
+          <h2>Frequently Asked Questions</h2>
+          <p>Straightforward answers in plain language.</p>
+        </div>
+
+        <div class="faq-list reveal">
+          <article class="clay-card faq-item">
+            <h3>
+              <button type="button" class="faq-trigger" aria-expanded="true" aria-controls="faq-panel-1" id="faq-btn-1">
+                <span>Is my data safe?</span>
+                <svg class="faq-chevron" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+            </h3>
+            <div class="faq-panel" id="faq-panel-1" role="region" aria-labelledby="faq-btn-1">
+              <p>Yes. Everything you type—your medicines, water glasses, and dark mode choice—is saved only inside your browser's local storage on your own device. Nothing is uploaded or shared with any server.</p>
+            </div>
+          </article>
+
+          <article class="clay-card faq-item">
+            <h3>
+              <button type="button" class="faq-trigger" aria-expanded="false" aria-controls="faq-panel-2" id="faq-btn-2">
+                <span>Does this replace a doctor?</span>
+                <svg class="faq-chevron" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+            </h3>
+            <div class="faq-panel" id="faq-panel-2" role="region" aria-labelledby="faq-btn-2" hidden>
+              <p>No. CalmDose is an organizational and informational tool only. It does not diagnose conditions, prescribe medicines, or replace professional advice from your doctor or pharmacist.</p>
+            </div>
+          </article>
+
+          <article class="clay-card faq-item">
+            <h3>
+              <button type="button" class="faq-trigger" aria-expanded="false" aria-controls="faq-panel-3" id="faq-btn-3">
+                <span>How can I switch to dark mode?</span>
+                <svg class="faq-chevron" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+            </h3>
+            <div class="faq-panel" id="faq-panel-3" role="region" aria-labelledby="faq-btn-3" hidden>
+              <p>Use the sun/moon toggle in the top bar (or inside the mobile Menu drawer). Your choice is remembered automatically next time you visit.</p>
+            </div>
+          </article>
+
+          <article class="clay-card faq-item">
+            <h3>
+              <button type="button" class="faq-trigger" aria-expanded="false" aria-controls="faq-panel-4" id="faq-btn-4">
+                <span>Can caregivers or parents use this for a family member?</span>
+                <svg class="faq-chevron" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+            </h3>
+            <div class="faq-panel" id="faq-panel-4" role="region" aria-labelledby="faq-btn-4" hidden>
+              <p>Yes. You can include a family member's name in the dose note (for example, "5 ml syrup for Leo") and tap "Mark as taken" together so everyone knows a dose was completed.</p>
+            </div>
+          </article>
+
+          <article class="clay-card faq-item">
+            <h3>
+              <button type="button" class="faq-trigger" aria-expanded="false" aria-controls="faq-panel-5" id="faq-btn-5">
+                <span>What happens if I clear my browser data?</span>
+                <svg class="faq-chevron" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+            </h3>
+            <div class="faq-panel" id="faq-panel-5" role="region" aria-labelledby="faq-btn-5" hidden>
+              <p>Because CalmDose keeps everything privately in your browser, clearing site data will reset your list back to the three sample medicines. You can also restore the sample list anytime with "Reset demo data."</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-wave section-wave--to-alt" aria-hidden="true">
+      <svg viewBox="0 0 1440 48" preserveAspectRatio="none">
+        <path class="wave-fill" d="M0,24 C320,48 640,0 960,24 C1180,40 1320,34 1440,18 L1440,48 L0,48 Z"></path>
+        <path class="wave-stroke" d="M0,24 C320,48 640,0 960,24 C1180,40 1320,34 1440,18"></path>
+      </svg>
+    </div>
+
+    <!-- =========================================================
+         CONTACT SECTION
+         ========================================================= -->
+    <section id="contact" class="section section-alt">
+      <div class="container">
+        <div class="section-header reveal">
+          <h2>Contact Us</h2>
+          <p>Have feedback on accessibility or want to share an idea? Send us a quick note.</p>
+        </div>
+
+        <div class="contact-grid reveal">
+          <form id="contact-form" class="clay-card" novalidate>
+            <div class="field-group">
+              <label class="field-label" for="contact-name">Your name</label>
+              <input class="clay-input" type="text" id="contact-name" placeholder="Jane Doe" required />
+              <span class="field-error" id="err-contact-name" role="alert"></span>
+            </div>
+
+            <div class="field-group" style="margin-top:12px;">
+              <label class="field-label" for="contact-email">Email address</label>
+              <input class="clay-input" type="email" id="contact-email" placeholder="you@example.com" required />
+              <span class="field-error" id="err-contact-email" role="alert"></span>
+            </div>
+
+            <div class="field-group" style="margin-top:12px;">
+              <label class="field-label" for="contact-message">Message</label>
+              <textarea class="clay-input" id="contact-message" placeholder="How can we make CalmDose clearer for you or your family?" required></textarea>
+              <span class="field-error" id="err-contact-message" role="alert"></span>
+            </div>
+
+            <button type="submit" class="clay-btn clay-btn--primary" style="margin-top:18px;">
+              Send Message
+            </button>
+          </form>
+
+          <aside class="clay-card clay-card--mint">
+            <h3>Community Support Info</h3>
+            <p style="margin-top:8px;">Placeholder contact details for demonstration:</p>
+
+            <div class="contact-info-list">
+              <div class="contact-info-item">
+                <span class="clay-icon" style="width:44px; height:44px; margin:0;" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                </span>
+                <div>
+                  <strong>Email</strong>
+                  <p>hello@calmdose.example</p>
+                </div>
+              </div>
+
+              <div class="contact-info-item">
+                <span class="clay-icon clay-icon--blue" style="width:44px; height:44px; margin:0;" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </span>
+                <div>
+                  <strong>Support Hours</strong>
+                  <p>Mon–Fri, 9:00 AM – 5:00 PM (Local Demo)</p>
+                </div>
+              </div>
+
+              <div class="contact-info-item">
+                <span class="clay-icon clay-icon--accent" style="width:44px; height:44px; margin:0;" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                </span>
+                <div>
+                  <strong>Office Placeholder</strong>
+                  <p>120 Meadow Lane, Suite 4B, Portland</p>
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- =========================================================
+       FOOTER
+       ========================================================= -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a href="#home" class="brand">
+            <span class="brand-mark" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.5 20.5 3.5 13.5a4.95 4.95 0 1 1 7-7l7 7a4.95 4.95 0 1 1-7 7Z" />
+                <path d="M8.5 8.5 15.5 15.5" />
+              </svg>
+            </span>
+            CalmDose
+          </a>
+          <p style="margin-top:12px;">
+            Gentle, all-age daily medicine tracking built for readability, calm routines, and complete local privacy.
+          </p>
+          <div class="social-row">
+            <a href="#contact" class="icon-action-btn" aria-label="CalmDose community mail">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            </a>
+            <a href="#about" class="icon-action-btn" aria-label="CalmDose accessibility story">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            </a>
+            <a href="#tracker" class="icon-action-btn" aria-label="Jump to Medicine Tracker">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div>
+          <h4>Explore</h4>
+          <ul class="footer-links">
+            <li><a href="#about">About &amp; Problem Statement</a></li>
+            <li><a href="#how-it-works">How It Works</a></li>
+            <li><a href="#tracker">Medicine Tracker</a></li>
+            <li><a href="#services">Services</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4>Helpful Pages</h4>
+          <ul class="footer-links">
+            <li><a href="#doctors">Find a Doctor &amp; Tips</a></li>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="disclaimer-box" role="note">
+        Medical Disclaimer: Informational only. Not a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare provider with questions about medicines or health conditions.
+      </div>
+
+      <div class="footer-bottom">
+        <span>&copy; <span id="copyright-year">2026</span> CalmDose. Created by Kenedy Duwarah.</span>
+        <span>All data stays privately on your device.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Container -->
+  <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- =========================================================
+       APPLICATION JAVASCRIPT (MODULAR SECTIONS)
+       ========================================================= -->
+  <script type="module">
+    import * as THREE from 'three';
+    import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+    /* ---------------------------------------------------------
+       MODULE 1: SAFE LOCALSTORAGE & TOAST HELPERS
+       --------------------------------------------------------- */
+    const storage = {
+      get(key, fallback) {
+        try {
+          const raw = window.localStorage.getItem(key);
+          return raw !== null ? JSON.parse(raw) : fallback;
+        } catch {
+          return fallback;
+        }
+      },
+      set(key, value) {
+        try {
+          window.localStorage.setItem(key, JSON.stringify(value));
+        } catch {
+          // Ignore storage quota or private-mode restrictions
+        }
+      }
+    };
+
+    const toastRegion = document.getElementById('toast-region');
+    function showToast(message, type = 'success') {
+      const el = document.createElement('div');
+      el.className = `toast toast--${type}`;
+      el.setAttribute('role', 'status');
+      el.textContent = message;
+      toastRegion.appendChild(el);
+      window.setTimeout(() => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(8px)';
+        el.style.transition = 'opacity 180ms ease, transform 180ms ease';
+        window.setTimeout(() => el.remove(), 200);
+      }, 3200);
+    }
+
+    document.getElementById('copyright-year').textContent = String(new Date().getFullYear());
+
+    /* ---------------------------------------------------------
+       MODULE 2: THEME (LIGHT / DARK MODE)
+       --------------------------------------------------------- */
+    const rootEl = document.documentElement;
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const drawerThemeToggleBtn = document.getElementById('drawer-theme-toggle');
+    const drawerThemeText = document.getElementById('drawer-theme-text');
+
+    function applyTheme(theme) {
+      rootEl.setAttribute('data-theme', theme);
+      const isDark = theme === 'dark';
+      document.querySelectorAll('.theme-icon-sun').forEach((el) => {
+        el.style.display = isDark ? 'none' : 'inline-block';
+      });
+      document.querySelectorAll('.theme-icon-moon').forEach((el) => {
+        el.style.display = isDark ? 'inline-block' : 'none';
+      });
+      themeToggleBtn.setAttribute('aria-pressed', String(isDark));
+      themeToggleBtn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+      drawerThemeToggleBtn.setAttribute('aria-pressed', String(isDark));
+      drawerThemeToggleBtn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+      drawerThemeText.textContent = isDark ? 'Light mode' : 'Dark mode';
+      storage.set('calmdose_theme', theme);
+    }
+
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    applyTheme(storage.get('calmdose_theme', prefersDark ? 'dark' : 'light'));
+
+    function toggleTheme() {
+      const next = rootEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+    }
+    themeToggleBtn.addEventListener('click', toggleTheme);
+    drawerThemeToggleBtn.addEventListener('click', toggleTheme);
+
+    /* ---------------------------------------------------------
+       MODULE 3: NAVBAR SCROLL, ACTIVE SECTION & MOBILE DRAWER
+       --------------------------------------------------------- */
+    const header = document.getElementById('site-header');
+    const menuToggle = document.getElementById('menu-toggle');
+    const mobileDrawer = document.getElementById('mobile-drawer');
+    const drawerBackdrop = document.getElementById('drawer-backdrop');
+    const drawerClose = document.getElementById('drawer-close');
+    const drawerLinks = document.querySelectorAll('.drawer-link, .drawer-cta');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    window.addEventListener('scroll', () => {
+      header.classList.toggle('scrolled', window.scrollY > 18);
+    }, { passive: true });
+
+    let isDrawerOpen = false;
+    function setDrawer(open) {
+      isDrawerOpen = open;
+      mobileDrawer.classList.toggle('open', open);
+      drawerBackdrop.classList.toggle('open', open);
+      mobileDrawer.setAttribute('aria-hidden', String(!open));
+      drawerBackdrop.setAttribute('aria-hidden', String(!open));
+      menuToggle.setAttribute('aria-expanded', String(open));
+      document.body.classList.toggle('drawer-open', open);
+
+      if (open) {
+        window.setTimeout(() => drawerClose.focus(), 60);
+      } else {
+        menuToggle.focus();
+      }
+    }
+
+    menuToggle.addEventListener('click', () => setDrawer(!isDrawerOpen));
+    drawerClose.addEventListener('click', () => setDrawer(false));
+    drawerBackdrop.addEventListener('click', () => setDrawer(false));
+    drawerLinks.forEach((link) => {
+      link.addEventListener('click', () => setDrawer(false));
+    });
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isDrawerOpen) {
+        setDrawer(false);
+      }
+    });
+
+    // Active Navigation Highlight via IntersectionObserver
+    const sectionIds = ['home', 'about', 'how-it-works', 'tracker', 'services', 'doctors', 'faq', 'contact'];
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.id;
+        navLinks.forEach((link) => {
+          link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
+        });
+        document.querySelectorAll('.drawer-link').forEach((link) => {
+          link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
+        });
+      });
+    }, { rootMargin: '-35% 0px -55% 0px' });
+
+    sectionIds.forEach((id) => {
+      const sec = document.getElementById(id);
+      if (sec) sectionObserver.observe(sec);
+    });
+
+    /* ---------------------------------------------------------
+       MODULE 4: SCROLL REVEAL & ANIMATED COUNTERS
+       --------------------------------------------------------- */
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const revealEls = document.querySelectorAll('.reveal');
+
+    if (reducedMotion) {
+      revealEls.forEach((el) => el.classList.add('revealed'));
+    } else {
+      const revealObs = new IntersectionObserver((entries, obs) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            obs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+      revealEls.forEach((el) => revealObs.observe(el));
+    }
+
+    // Animated counters
+    const counterEls = document.querySelectorAll('[data-counter]');
+    const counterObs = new IntersectionObserver((entries, obs) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        const target = Number(el.dataset.counter || 0);
+        const suffix = el.dataset.suffix || '';
+        obs.unobserve(el);
+        if (reducedMotion || target === 0) {
+          el.textContent = `${target}${suffix}`;
+          return;
+        }
+        const duration = 700;
+        const start = performance.now();
+        function step(now) {
+          const t = Math.min((now - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - t, 3);
+          el.textContent = `${Math.round(target * eased)}${suffix}`;
+          if (t < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+      });
+    }, { threshold: 0.35 });
+    counterEls.forEach((el) => counterObs.observe(el));
+
+    /* ---------------------------------------------------------
+       MODULE 5: THREE.JS 3D MEDICINE HERO SCENE + FALLBACK
+       --------------------------------------------------------- */
+    let triggerHeroSpin = () => {};
+
+    (function initThreeMedicine() {
+      const stage = document.getElementById('hero-stage');
+      const canvas = document.getElementById('medicine-canvas');
+      const fallback = document.getElementById('hero-fallback');
+      const stageHint = document.getElementById('stage-hint');
+
+      function activateFallback() {
+        canvas.style.display = 'none';
+        stageHint.style.display = 'none';
+        fallback.classList.add('active');
+      }
+
+      try {
+        // Software WebGL probe
+        const isSoftwareGl = (() => {
+          const probe = document.createElement('canvas');
+          const gl = probe.getContext('webgl2') || probe.getContext('webgl');
+          if (!gl) return true;
+          const ext = gl.getExtension('WEBGL_debug_renderer_info');
+          const param = ext ? ext.UNMASKED_RENDERER_WEBGL : gl.RENDERER;
+          const gpu = String(gl.getParameter(param) || '');
+          gl.getExtension('WEBGL_lose_context')?.loseContext();
+          return /SwiftShader|llvmpipe|softpipe|Software|Basic Render/i.test(gpu);
+        })();
+
+        const renderer = new THREE.WebGLRenderer({
+          canvas,
+          alpha: true,
+          antialias: !isSoftwareGl,
+          powerPreference: 'high-performance'
+        });
+
+        const isMobile = window.innerWidth < 640;
+        renderer.setPixelRatio(isSoftwareGl ? 1 : Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2));
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.08;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(42, stage.clientWidth / stage.clientHeight, 0.1, 50);
+        camera.position.set(0, 0.2, 7.2);
+
+        // Studio environment reflections for glossy clay capsules
+        const pmremGenerator = new THREE.PMREMGenerator(renderer);
+        scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
+        pmremGenerator.dispose();
+
+        // Soft 3-Point Lighting
+        const hemiLight = new THREE.HemisphereLight(0xf6fffd, 0xdbe6f2, 0.9);
+        scene.add(hemiLight);
+
+        const keyLight = new THREE.DirectionalLight(0xfff7ed, 1.45);
+        keyLight.position.set(4, 6, 5);
+        scene.add(keyLight);
+
+        const rimLight = new THREE.DirectionalLight(0x99f6e4, 0.85);
+        rimLight.position.set(-5, 2, -4);
+        scene.add(rimLight);
+
+        // Reusable Material Helpers
+        function clayMaterial(colorHex, roughness = 0.26, clearcoat = 0.85) {
+          return new THREE.MeshPhysicalMaterial({
+            color: colorHex,
+            roughness,
+            metalness: 0.04,
+            clearcoat,
+            clearcoatRoughness: 0.14
+          });
+        }
+
+        // Composite 3-part Two-Tone Capsule Builder
+        function createCapsule(colorTop, colorBottom, scale = 1) {
+          const group = new THREE.Group();
+          const radius = 0.36 * scale;
+          const halfLen = 0.38 * scale;
+
+          const capGeo = new THREE.SphereGeometry(radius, 28, 18, 0, Math.PI * 2, 0, Math.PI / 2);
+          const cylGeo = new THREE.CylinderGeometry(radius, radius, halfLen, 28);
+          const seamGeo = new THREE.TorusGeometry(radius * 1.005, 0.018 * scale, 12, 32);
+
+          const matTop = clayMaterial(colorTop, 0.22, 0.9);
+          const matBottom = clayMaterial(colorBottom, 0.32, 0.75);
+          const matSeam = clayMaterial(0xe2e8f0, 0.55, 0.2);
+
+          const topCyl = new THREE.Mesh(cylGeo, matTop);
+          topCyl.position.y = halfLen / 2;
+          const topDome = new THREE.Mesh(capGeo, matTop);
+          topDome.position.y = halfLen;
+
+          const botCyl = new THREE.Mesh(cylGeo, matBottom);
+          botCyl.position.y = -halfLen / 2;
+          const botDome = new THREE.Mesh(capGeo, matBottom);
+          botDome.rotation.x = Math.PI;
+          botDome.position.y = -halfLen;
+
+          const seam = new THREE.Mesh(seamGeo, matSeam);
+          seam.rotation.x = Math.PI / 2;
+
+          group.add(topCyl, topDome, botCyl, botDome, seam);
+          return group;
+        }
+
+        // Composite 3-part Scored Round Tablet Builder
+        function createTablet(colorHex, scale = 1) {
+          const group = new THREE.Group();
+          const r = 0.48 * scale;
+          const h = 0.2 * scale;
+
+          const bodyGeo = new THREE.CylinderGeometry(r, r, h, 36);
+          const rimGeo = new THREE.TorusGeometry(r * 0.97, 0.04 * scale, 12, 36);
+          const scoreGeo = new THREE.BoxGeometry(r * 1.45, 0.03 * scale, 0.045 * scale);
+
+          const matBody = clayMaterial(colorHex, 0.48, 0.3);
+          const matScore = clayMaterial(0x94a3b8, 0.7, 0.1);
+
+          const disc = new THREE.Mesh(bodyGeo, matBody);
+          const topBevel = new THREE.Mesh(rimGeo, matBody);
+          topBevel.rotation.x = Math.PI / 2;
+          topBevel.position.y = h / 2 - 0.01 * scale;
+
+          const botBevel = new THREE.Mesh(rimGeo, matBody);
+          botBevel.rotation.x = Math.PI / 2;
+          botBevel.position.y = -h / 2 + 0.01 * scale;
+
+          const groove = new THREE.Mesh(scoreGeo, matScore);
+          groove.position.y = h / 2 + 0.005 * scale;
+
+          group.add(disc, topBevel, botBevel, groove);
+          return group;
+        }
+
+        // Composite 6-part Medicine Bottle with Plus-Sign Label
+        function createBottle(scale = 1) {
+          const group = new THREE.Group();
+
+          const bodyMat = clayMaterial(0xa7dcd3, 0.25, 0.85);
+          const capMat = clayMaterial(0xffffff, 0.38, 0.5);
+          const labelMat = clayMaterial(0xf8fafc, 0.65, 0.15);
+          const plusMat = clayMaterial(0xc44d34, 0.3, 0.6);
+
+          const body = new THREE.Mesh(new THREE.CylinderGeometry(0.62 * scale, 0.62 * scale, 1.35 * scale, 32), bodyMat);
+          const shoulder = new THREE.Mesh(new THREE.CylinderGeometry(0.42 * scale, 0.62 * scale, 0.22 * scale, 32), bodyMat);
+          shoulder.position.y = 0.78 * scale;
+
+          const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.38 * scale, 0.38 * scale, 0.16 * scale, 28), bodyMat);
+          neck.position.y = 0.94 * scale;
+
+          const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.45 * scale, 0.45 * scale, 0.28 * scale, 28), capMat);
+          cap.position.y = 1.12 * scale;
+
+          const label = new THREE.Mesh(new THREE.CylinderGeometry(0.635 * scale, 0.635 * scale, 0.72 * scale, 32, 1, true, -0.85, 1.7), labelMat);
+          label.position.y = -0.02 * scale;
+
+          const plusV = new THREE.Mesh(new THREE.BoxGeometry(0.11 * scale, 0.34 * scale, 0.05 * scale), plusMat);
+          plusV.position.set(0, -0.02 * scale, 0.64 * scale);
+
+          const plusH = new THREE.Mesh(new THREE.BoxGeometry(0.34 * scale, 0.11 * scale, 0.05 * scale), plusMat);
+          plusH.position.set(0, -0.02 * scale, 0.64 * scale);
+
+          group.add(body, shoulder, neck, cap, label, plusV, plusH);
+          return group;
+        }
+
+        const rootGroup = new THREE.Group();
+        scene.add(rootGroup);
+
+        const items = [];
+        const clickableMeshes = [];
+
+        function registerItem(obj, basePos, baseRot, phase, targetScale = 1) {
+          obj.position.copy(basePos);
+          obj.rotation.copy(baseRot);
+          obj.scale.setScalar(0.01);
+          rootGroup.add(obj);
+          const entry = {
+            obj,
+            basePos: basePos.clone(),
+            baseRot: baseRot.clone(),
+            phase,
+            targetScale,
+            currentScale: 0.01,
+            spinVelocity: 0
+          };
+          items.push(entry);
+          obj.traverse((child) => {
+            if (child.isMesh) {
+              child.userData.itemEntry = entry;
+              clickableMeshes.push(child);
+            }
+          });
+        }
+
+        // 3 Two-Tone Capsules + 2 Tablets + 1 Bottle (trimmed slightly on small mobile)
+        registerItem(
+          createCapsule(0x0d6e66, 0xf8fafc, 1.05),
+          new THREE.Vector3(-1.55, 0.65, 0.3),
+          new THREE.Euler(0.3, 0.2, 0.55),
+          0.0
+        );
+        registerItem(
+          createCapsule(0xe06d53, 0xfcece5, 0.95),
+          new THREE.Vector3(1.55, 0.85, -0.2),
+          new THREE.Euler(-0.4, 0.5, -0.7),
+          1.6
+        );
+        registerItem(
+          createBottle(1.0),
+          new THREE.Vector3(0.05, -0.2, 0.0),
+          new THREE.Euler(0.12, -0.28, 0.08),
+          0.9
+        );
+        registerItem(
+          createTablet(0x9bc2eb, 1.0),
+          new THREE.Vector3(-1.3, -1.05, 0.55),
+          new THREE.Euler(0.7, 0.2, 0.3),
+          2.4
+        );
+        if (!isMobile) {
+          registerItem(
+            createCapsule(0x8b7fd4, 0xede9fe, 0.85),
+            new THREE.Vector3(1.65, -0.95, 0.4),
+            new THREE.Euler(0.5, -0.3, 0.9),
+            3.1
+          );
+          registerItem(
+            createTablet(0x8be0cf, 0.9),
+            new THREE.Vector3(-0.35, 1.45, -0.4),
+            new THREE.Euler(0.95, 0.4, -0.2),
+            4.2
+          );
+        }
+
+        // Resize Handler
+        function resize() {
+          const w = stage.clientWidth;
+          const h = stage.clientHeight || 300;
+          camera.aspect = w / h;
+          camera.updateProjectionMatrix();
+          renderer.setSize(w, h, false);
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        // Pointer Parallax + Scroll Drift
+        const targetParallax = { x: 0, y: 0 };
+        const currentParallax = { x: 0, y: 0 };
+        const raycaster = new THREE.Raycaster();
+        const pointer = new THREE.Vector2();
+
+        stage.addEventListener('pointermove', (e) => {
+          const rect = stage.getBoundingClientRect();
+          const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+          const ny = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+          targetParallax.x = nx * 0.26;
+          targetParallax.y = ny * 0.18;
+        }, { passive: true });
+
+        stage.addEventListener('pointerleave', () => {
+          targetParallax.x = 0;
+          targetParallax.y = 0;
+        });
+
+        stage.addEventListener('click', (e) => {
+          const rect = stage.getBoundingClientRect();
+          pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+          pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+          raycaster.setFromCamera(pointer, camera);
+          const hits = raycaster.intersectObjects(clickableMeshes, false);
+          if (hits.length > 0 && hits[0].object.userData.itemEntry) {
+            hits[0].object.userData.itemEntry.spinVelocity = 11.5;
+          }
+        });
+
+        triggerHeroSpin = () => {
+          if (items.length > 0) {
+            items[0].spinVelocity = 14.0;
+            if (items[1]) items[1].spinVelocity = -10.0;
+          }
+        };
+
+        // Pause rendering when off-screen or tab hidden
+        let isVisible = true;
+        const heroVisObs = new IntersectionObserver((entries) => {
+          isVisible = entries[0].isIntersecting;
+          if (isVisible && !frameId && !reducedMotion) {
+            lastTime = performance.now();
+            scheduleNext();
+          }
+        }, { threshold: 0.05 });
+        heroVisObs.observe(stage);
+
+        document.addEventListener('visibilitychange', () => {
+          if (!document.hidden && isVisible && !frameId && !reducedMotion) {
+            lastTime = performance.now();
+            scheduleNext();
+          }
+        });
+
+        canvas.addEventListener('webglcontextlost', (e) => {
+          e.preventDefault();
+          activateFallback();
+        });
+
+        // Animation Loop (with software-WebGL pacing)
+        let frameId = 0;
+        let lastTime = performance.now();
+        let elapsed = 0;
+
+        function afterDraw(cb) {
+          const gl = renderer.getContext();
+          if (gl && typeof gl.fenceSync === 'function') {
+            const sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
+            gl.flush();
+            const poll = () => {
+              const state = sync && gl.getSyncParameter(sync, gl.SYNC_STATUS);
+              if (state === gl.UNSIGNALED) {
+                frameId = window.setTimeout(poll, 5);
+              } else {
+                if (sync) gl.deleteSync(sync);
+                frameId = window.setTimeout(cb, 80);
+              }
+            };
+            frameId = window.setTimeout(poll, 5);
+          } else {
+            frameId = window.setTimeout(cb, 80);
+          }
+        }
+
+        function tick(now) {
+          frameId = 0;
+          if (!isVisible || document.hidden) return;
+
+          const dt = Math.min((now - lastTime) / 1000, 0.1);
+          lastTime = now;
+          if (!reducedMotion) elapsed += dt;
+
+          // Scroll-linked subtle drift
+          const scrollRatio = Math.min(window.scrollY / 600, 1);
+          currentParallax.x = THREE.MathUtils.damp(currentParallax.x, targetParallax.x, 5, dt);
+          currentParallax.y = THREE.MathUtils.damp(currentParallax.y, targetParallax.y - scrollRatio * 0.35, 5, dt);
+
+          rootGroup.rotation.y = currentParallax.x;
+          rootGroup.rotation.x = -currentParallax.y * 0.6;
+
+          items.forEach((item, idx) => {
+            // Staggered entrance scale
+            const delay = idx * 0.09;
+            if (elapsed > delay || reducedMotion) {
+              item.currentScale = THREE.MathUtils.damp(item.currentScale, item.targetScale, 6, dt || 0.016);
+              item.obj.scale.setScalar(item.currentScale);
+            }
+
+            // Sin-wave bobbing + spin impulse
+            const bob = reducedMotion ? 0 : Math.sin(elapsed * 1.45 + item.phase) * 0.14;
+            item.obj.position.y = item.basePos.y + bob;
+            item.obj.rotation.y += (reducedMotion ? 0 : 0.32 * dt) + item.spinVelocity * dt;
+            item.spinVelocity = THREE.MathUtils.damp(item.spinVelocity, 0, 4.5, dt || 0.016);
+          });
+
+          renderer.render(scene, camera);
+
+          if (!reducedMotion) {
+            scheduleNext();
+          }
+        }
+
+        function scheduleNext() {
+          if (isSoftwareGl) {
+            afterDraw(() => tick(performance.now()));
+          } else {
+            frameId = requestAnimationFrame(tick);
+          }
+        }
+
+        // Initial render (and start loop unless reducedMotion prefers static calm view)
+        items.forEach((item) => item.obj.scale.setScalar(item.targetScale));
+        renderer.render(scene, camera);
+        if (!reducedMotion) {
+          items.forEach((item) => item.obj.scale.setScalar(0.01));
+          scheduleNext();
+        }
+      } catch (err) {
+        activateFallback();
+      }
+    })();
+
+    /* ---------------------------------------------------------
+       MODULE 6: MEDICINE TRACKER, STREAK, WATER & BMI LOGIC
+       --------------------------------------------------------- */
+    const STORAGE_MEDS = 'calmdose_medicines_v1';
+    const STORAGE_WATER = 'calmdose_water_v1';
+    const STORAGE_STREAK = 'calmdose_streak_v1';
+
+    function getTodayDateKey() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    function createDemoMedicines() {
+      return [
+        { id: 'demo-1', name: 'Vitamin D3', dose: '1 softgel with breakfast', time: '08:30', shape: 'capsule', takenDate: null },
+        { id: 'demo-2', name: 'Blood Pressure Tablet', dose: '1 tablet with water', time: '13:00', shape: 'tablet', takenDate: null },
+        { id: 'demo-3', name: 'Evening Omega-3', dose: '1 capsule after dinner', time: '20:00', shape: 'capsule', takenDate: null }
+      ];
+    }
+
+    let medicines = storage.get(STORAGE_MEDS, null);
+    if (!Array.isArray(medicines)) {
+      medicines = createDemoMedicines();
+      storage.set(STORAGE_MEDS, medicines);
+    }
+
+    let waterState = storage.get(STORAGE_WATER, { date: getTodayDateKey(), glasses: 4 });
+    if (waterState.date !== getTodayDateKey()) {
+      waterState = { date: getTodayDateKey(), glasses: 0 };
+      storage.set(STORAGE_WATER, waterState);
+    }
+
+    let streakState = storage.get(STORAGE_STREAK, { count: 1, lastCompletedDate: null });
+
+    const scheduleListEl = document.getElementById('schedule-list');
+    const medForm = document.getElementById('medicine-form');
+    const medFormTitle = document.getElementById('med-form-title');
+    const medEditIdInput = document.getElementById('med-edit-id');
+    const medNameInput = document.getElementById('med-name');
+    const medDoseInput = document.getElementById('med-dose');
+    const medTimeInput = document.getElementById('med-time');
+    const medShapeInput = document.getElementById('med-shape');
+    const medSubmitBtn = document.getElementById('med-submit-btn');
+    const medCancelEditBtn = document.getElementById('med-cancel-edit');
+
+    const progressRingCircle = document.getElementById('progress-ring-circle');
+    const progressRingLabel = document.getElementById('progress-ring-label');
+    const progressSubtext = document.getElementById('progress-subtext');
+    const countdownValueEl = document.getElementById('next-dose-countdown');
+    const countdownDetailEl = document.getElementById('next-dose-detail');
+    const streakValueEl = document.getElementById('streak-value');
+    const celebrationBanner = document.getElementById('celebration-banner');
+
+    function shapeIconSvg(shape) {
+      if (shape === 'tablet') {
+        return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><line x1="8" y1="12" x2="16" y2="12"/></svg>`;
+      }
+      if (shape === 'syrup') {
+        return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6v3l2 3v10a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V9l2-3V3z"/><path d="M9 13h6"/></svg>`;
+      }
+      return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.5 20.5 3.5 13.5a4.95 4.95 0 1 1 7-7l7 7a4.95 4.95 0 1 1-7 7Z"/><path d="M8.5 8.5 15.5 15.5"/></svg>`;
+    }
+
+    function formatDisplayTime(hhmm) {
+      const [hStr, mStr] = hhmm.split(':');
+      const h = Number(hStr);
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const h12 = h % 12 || 12;
+      return `${h12}:${mStr} ${ampm}`;
+    }
+
+    function getStatusInfo(med) {
+      const today = getTodayDateKey();
+      if (med.takenDate === today) {
+        return {
+          key: 'taken',
+          label: 'Taken',
+          cls: 'status-badge--taken',
+          icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>`
+        };
+      }
+      const now = new Date();
+      const [hh, mm] = med.time.split(':').map(Number);
+      const due = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hh, mm, 0);
+      const diffMinutes = (due.getTime() - now.getTime()) / 60000;
+      if (diffMinutes <= 30) {
+        return {
+          key: 'due',
+          label: 'Due now',
+          cls: 'status-badge--due',
+          icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>`
+        };
+      }
+      return {
+        key: 'upcoming',
+        label: 'Upcoming',
+        cls: 'status-badge--upcoming',
+        icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l2 2"/></svg>`
+      };
+    }
+
+    function updateCountdownAndRing() {
+      const today = getTodayDateKey();
+      const total = medicines.length;
+      const takenCount = medicines.filter((m) => m.takenDate === today).length;
+      const pct = total > 0 ? Math.round((takenCount / total) * 100) : 0;
+
+      const circumference = 2 * Math.PI * 50;
+      progressRingCircle.style.strokeDashoffset = String(circumference * (1 - pct / 100));
+      progressRingLabel.textContent = `${pct}%`;
+      progressSubtext.textContent = `${takenCount} of ${total} doses taken today`;
+
+      // Check streak celebration
+      const allTaken = total > 0 && takenCount === total;
+      celebrationBanner.classList.toggle('visible', allTaken);
+      if (allTaken && streakState.lastCompletedDate !== today) {
+        streakState.count = (streakState.count || 0) + 1;
+        streakState.lastCompletedDate = today;
+        storage.set(STORAGE_STREAK, streakState);
+      }
+      streakValueEl.textContent = String(streakState.count);
+
+      // Next dose countdown
+      const remaining = medicines
+        .filter((m) => m.takenDate !== today)
+        .sort((a, b) => a.time.localeCompare(b.time));
+
+      if (total === 0) {
+        countdownValueEl.textContent = 'No medicines scheduled';
+        countdownDetailEl.textContent = 'Add a medicine on the left to start your schedule.';
+        return;
+      }
+
+      if (remaining.length === 0) {
+        countdownValueEl.textContent = 'All caught up for today';
+        countdownDetailEl.textContent = 'Enjoy the rest of your day.';
+        return;
+      }
+
+      const now = new Date();
+      let nextMed = null;
+      let nextDate = null;
+
+      for (const m of remaining) {
+        const [hh, mm] = m.time.split(':').map(Number);
+        const candidate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hh, mm, 0);
+        if (candidate >= now) {
+          nextMed = m;
+          nextDate = candidate;
+          break;
+        }
+      }
+
+      if (!nextMed) {
+        // First remaining is already due earlier today
+        nextMed = remaining[0];
+        countdownValueEl.textContent = 'Due now';
+        countdownDetailEl.textContent = `${nextMed.name} (${formatDisplayTime(nextMed.time)})`;
+        return;
+      }
+
+      const diffMs = nextDate.getTime() - now.getTime();
+      const totalMins = Math.floor(diffMs / 60000);
+      const hrs = Math.floor(totalMins / 60);
+      const mins = totalMins % 60;
+      const secs = Math.floor((diffMs % 60000) / 1000);
+
+      if (hrs > 0) {
+        countdownValueEl.textContent = `Next dose in ${hrs}h ${mins}m`;
+      } else if (mins > 0) {
+        countdownValueEl.textContent = `Next dose in ${mins}m ${secs}s`;
+      } else {
+        countdownValueEl.textContent = `Next dose in ${secs}s`;
+      }
+      countdownDetailEl.textContent = `${nextMed.name} at ${formatDisplayTime(nextMed.time)}`;
+    }
+
+    function renderSchedule() {
+      const sorted = [...medicines].sort((a, b) => a.time.localeCompare(b.time));
+      scheduleListEl.innerHTML = '';
+
+      if (sorted.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'empty-state';
+        empty.innerHTML = `
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="4" width="18" height="18" rx="4"/>
+            <path d="M16 2v4M8 2v4M3 10h18"/>
+          </svg>
+          <h4>Your schedule is empty</h4>
+          <p>Add a medicine using the form, or restore the sample schedule to explore.</p>
+          <button type="button" class="clay-btn clay-btn--primary clay-btn--sm" id="empty-restore-btn">Restore sample medicines</button>
+        `;
+        scheduleListEl.appendChild(empty);
+        document.getElementById('empty-restore-btn').addEventListener('click', resetDemoData);
+        updateCountdownAndRing();
+        return;
+      }
+
+      const today = getTodayDateKey();
+      sorted.forEach((med) => {
+        const isTaken = med.takenDate === today;
+        const status = getStatusInfo(med);
+
+        const card = document.createElement('article');
+        card.className = `clay-card med-card${isTaken ? ' is-taken' : ''}`;
+        card.innerHTML = `
+          <div class="med-shape-icon" aria-hidden="true">${shapeIconSvg(med.shape)}</div>
+          <div>
+            <h4>${escapeHtml(med.name)}</h4>
+            <p style="font-size:0.94rem; margin-top:2px;">${escapeHtml(med.dose)}</p>
+            <div class="med-meta">
+              <strong class="tabular-nums" style="color:var(--text);">${formatDisplayTime(med.time)}</strong>
+              <span class="status-badge ${status.cls}">
+                ${status.icon}
+                <span>${status.label}</span>
+              </span>
+            </div>
+          </div>
+          <div class="med-actions">
+            <button type="button" class="clay-btn ${isTaken ? 'clay-btn--ghost' : 'clay-btn--primary'}" data-action="toggle" data-id="${escapeHtml(med.id)}">
+              ${isTaken ? 'Taken · Undo' : 'Mark as taken'}
+            </button>
+            <button type="button" class="icon-action-btn" data-action="edit" data-id="${escapeHtml(med.id)}" aria-label="Edit ${escapeHtml(med.name)}">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            </button>
+            <button type="button" class="icon-action-btn" data-action="delete" data-id="${escapeHtml(med.id)}" aria-label="Delete ${escapeHtml(med.name)}">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+          </div>
+        `;
+        scheduleListEl.appendChild(card);
+      });
+
+      updateCountdownAndRing();
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    scheduleListEl.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-action]');
+      if (!btn) return;
+      const { action, id } = btn.dataset;
+      const med = medicines.find((m) => m.id === id);
+      if (!med) return;
+
+      if (action === 'toggle') {
+        const today = getTodayDateKey();
+        if (med.takenDate === today) {
+          med.takenDate = null;
+          showToast(`Marked "${med.name}" as not taken yet.`);
+        } else {
+          med.takenDate = today;
+          triggerHeroSpin();
+          showToast(`Marked "${med.name}" as taken!`);
+        }
+        storage.set(STORAGE_MEDS, medicines);
+        renderSchedule();
+      } else if (action === 'edit') {
+        medEditIdInput.value = med.id;
+        medNameInput.value = med.name;
+        medDoseInput.value = med.dose;
+        medTimeInput.value = med.time;
+        medShapeInput.value = med.shape;
+        medFormTitle.textContent = 'Edit Medicine';
+        medSubmitBtn.textContent = 'Update Medicine';
+        medCancelEditBtn.hidden = false;
+        medNameInput.focus();
+      } else if (action === 'delete') {
+        medicines = medicines.filter((m) => m.id !== id);
+        if (medEditIdInput.value === id) resetMedForm();
+        storage.set(STORAGE_MEDS, medicines);
+        renderSchedule();
+        showToast(`Removed "${med.name}" from schedule.`);
+      }
+    });
+
+    function resetMedForm() {
+      medForm.reset();
+      medEditIdInput.value = '';
+      medFormTitle.textContent = 'Add a Medicine';
+      medSubmitBtn.textContent = 'Save Medicine';
+      medCancelEditBtn.hidden = true;
+      document.getElementById('err-med-name').textContent = '';
+      document.getElementById('err-med-dose').textContent = '';
+      document.getElementById('err-med-time').textContent = '';
+    }
+
+    medCancelEditBtn.addEventListener('click', resetMedForm);
+
+    medForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = medNameInput.value.trim();
+      const dose = medDoseInput.value.trim();
+      const time = medTimeInput.value.trim();
+      const shape = medShapeInput.value;
+
+      const errName = document.getElementById('err-med-name');
+      const errDose = document.getElementById('err-med-dose');
+      const errTime = document.getElementById('err-med-time');
+
+      errName.textContent = name ? '' : 'Please enter the medicine name.';
+      errDose.textContent = dose ? '' : 'Please enter the dose (for example, 1 tablet).';
+      errTime.textContent = time ? '' : 'Please choose a time of day.';
+
+      if (!name || !dose || !time) {
+        showToast('Please fill in the highlighted medicine fields.', 'error');
+        return;
+      }
+
+      const editId = medEditIdInput.value;
+      if (editId) {
+        const target = medicines.find((m) => m.id === editId);
+        if (target) {
+          target.name = name;
+          target.dose = dose;
+          target.time = time;
+          target.shape = shape;
+          showToast(`Updated "${name}".`);
+        }
+      } else {
+        medicines.push({
+          id: `med-${Date.now()}`,
+          name,
+          dose,
+          time,
+          shape,
+          takenDate: null
+        });
+        showToast(`Added "${name}" to today's schedule.`);
+      }
+
+      storage.set(STORAGE_MEDS, medicines);
+      resetMedForm();
+      renderSchedule();
+    });
+
+    function resetDemoData() {
+      medicines = createDemoMedicines();
+      waterState = { date: getTodayDateKey(), glasses: 4 };
+      streakState = { count: 1, lastCompletedDate: null };
+      storage.set(STORAGE_MEDS, medicines);
+      storage.set(STORAGE_WATER, waterState);
+      storage.set(STORAGE_STREAK, streakState);
+      resetMedForm();
+      renderSchedule();
+      renderWater();
+      showToast('Demo data restored.');
+    }
+
+    document.getElementById('reset-demo-btn').addEventListener('click', resetDemoData);
+
+    // Water Intake Counter
+    const waterCountEl = document.getElementById('water-count');
+    const waterCupsEl = document.getElementById('water-cups');
+
+    function renderWater() {
+      waterCountEl.textContent = String(waterState.glasses);
+      waterCupsEl.innerHTML = '';
+      for (let i = 1; i <= 8; i++) {
+        const cup = document.createElement('div');
+        cup.className = `water-cup${i <= waterState.glasses ? ' filled' : ''}`;
+        waterCupsEl.appendChild(cup);
+      }
+    }
+
+    document.getElementById('water-plus').addEventListener('click', () => {
+      if (waterState.glasses < 12) {
+        waterState.glasses += 1;
+        storage.set(STORAGE_WATER, waterState);
+        renderWater();
+      }
+    });
+
+    document.getElementById('water-minus').addEventListener('click', () => {
+      if (waterState.glasses > 0) {
+        waterState.glasses -= 1;
+        storage.set(STORAGE_WATER, waterState);
+        renderWater();
+      }
+    });
+
+    // BMI Calculator
+    const bmiForm = document.getElementById('bmi-form');
+    const bmiResultEl = document.getElementById('bmi-result');
+
+    bmiForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const h = Number(document.getElementById('bmi-height').value);
+      const w = Number(document.getElementById('bmi-weight').value);
+
+      if (!h || h < 80 || h > 250 || !w || w < 20 || w > 300) {
+        bmiResultEl.innerHTML = `<span style="color:var(--status-due-text); font-weight:700;">Please enter a valid height (80–250 cm) and weight (20–300 kg).</span>`;
+        return;
+      }
+
+      const meters = h / 100;
+      const bmi = w / (meters * meters);
+      const rounded = bmi.toFixed(1);
+      let label = 'Reference healthy range (18.5–24.9)';
+      if (bmi < 18.5) label = 'Below 18.5 reference range';
+      else if (bmi >= 25 && bmi < 30) label = 'Above 24.9 reference range (25.0–29.9)';
+      else if (bmi >= 30) label = '30.0 or above reference range';
+
+      bmiResultEl.innerHTML = `<strong class="tabular-nums">BMI: ${rounded}</strong> — ${label}`;
+    });
+
+    renderSchedule();
+    renderWater();
+    window.setInterval(updateCountdownAndRing, 1000);
+
+    /* ---------------------------------------------------------
+       MODULE 7: SEARCHABLE DOCTORS DIRECTORY
+       --------------------------------------------------------- */
+    const doctorsData = [
+      { name: 'Dr. Clara Chen', specialty: 'Family Medicine', city: 'Portland', availability: 'Available Mon–Thu' },
+      { name: 'Dr. Marcus Vance', specialty: 'Geriatrics', city: 'Seattle', availability: 'Morning slots open' },
+      { name: 'Dr. Priya Nair', specialty: 'Pediatrics', city: 'Portland', availability: 'Accepting new families' },
+      { name: 'Dr. Thomas Lindqvist', specialty: 'Cardiology', city: 'Eugene', availability: 'Tues & Fri clinic' },
+      { name: 'Dr. Hannah Brooks', specialty: 'Family Medicine', city: 'Tacoma', availability: 'Same-week visits' },
+      { name: 'Dr. Mateo Silva', specialty: 'Geriatrics', city: 'Portland', availability: 'Home-care consults' }
+    ];
+
+    const doctorGrid = document.getElementById('doctor-grid');
+    const doctorSearch = document.getElementById('doctor-search');
+    const specialtyBtns = document.querySelectorAll('[data-specialty]');
+    let activeSpecialty = 'all';
+
+    function renderDoctors() {
+      const q = doctorSearch.value.trim().toLowerCase();
+      const filtered = doctorsData.filter((doc) => {
+        const matchesSpec = activeSpecialty === 'all' || doc.specialty === activeSpecialty;
+        const matchesText =
+          !q ||
+          doc.name.toLowerCase().includes(q) ||
+          doc.specialty.toLowerCase().includes(q) ||
+          doc.city.toLowerCase().includes(q);
+        return matchesSpec && matchesText;
+      });
+
+      doctorGrid.innerHTML = '';
+      if (filtered.length === 0) {
+        doctorGrid.innerHTML = `
+          <div class="clay-card" style="grid-column: 1 / -1; text-align:center;">
+            <h4>No matching doctors found</h4>
+            <p style="margin:8px auto 0;">Try clearing your search or choosing "All" specialties.</p>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach((doc) => {
+        const card = document.createElement('article');
+        card.className = 'clay-card doctor-card interactive';
+        card.innerHTML = `
+          <div>
+            <h4>${escapeHtml(doc.name)}</h4>
+            <p style="color:var(--primary); font-weight:700; margin-top:4px;">${escapeHtml(doc.specialty)} · ${escapeHtml(doc.city)}</p>
+          </div>
+          <span class="status-badge status-badge--taken" style="align-self:flex-start;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+            <span>${escapeHtml(doc.availability)}</span>
+          </span>
+        `;
+        doctorGrid.appendChild(card);
+      });
+    }
+
+    doctorSearch.addEventListener('input', renderDoctors);
+    specialtyBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        activeSpecialty = btn.dataset.specialty;
+        specialtyBtns.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+        renderDoctors();
+      });
+    });
+    renderDoctors();
+
+    /* ---------------------------------------------------------
+       MODULE 8: ACCESSIBLE FAQ ACCORDION
+       --------------------------------------------------------- */
+    const faqTriggers = document.querySelectorAll('.faq-trigger');
+    faqTriggers.forEach((trigger) => {
+      trigger.addEventListener('click', () => {
+        const expanded = trigger.getAttribute('aria-expanded') === 'true';
+        const panelId = trigger.getAttribute('aria-controls');
+        const panel = document.getElementById(panelId);
+
+        trigger.setAttribute('aria-expanded', String(!expanded));
+        if (panel) panel.hidden = expanded;
+      });
+    });
+
+    /* ---------------------------------------------------------
+       MODULE 9: CONTACT FORM VALIDATION
+       --------------------------------------------------------- */
+    const contactForm = document.getElementById('contact-form');
+    contactForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('contact-name').value.trim();
+      const email = document.getElementById('contact-email').value.trim();
+      const msg = document.getElementById('contact-message').value.trim();
+
+      const errName = document.getElementById('err-contact-name');
+      const errEmail = document.getElementById('err-contact-email');
+      const errMsg = document.getElementById('err-contact-message');
+
+      const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      errName.textContent = name ? '' : 'Please enter your name.';
+      errEmail.textContent = emailValid ? '' : 'Please enter a valid email address.';
+      errMsg.textContent = msg.length >= 8 ? '' : 'Please write a short message (at least 8 characters).';
+
+      if (!name || !emailValid || msg.length < 8) {
+        showToast('Please check the highlighted contact fields.', 'error');
+        return;
+      }
+
+      contactForm.reset();
+      showToast('Thank you! Your message has been received (local demo).');
+    });
+  </script>
+</body>
+</html>

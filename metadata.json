@@ -1,0 +1,6 @@
+{
+  "name": "CalmDose — Simple Daily Medicine Tracker & Health Care",
+  "description": "Calm, all-age daily medicine reminder and pill tracker with 3D capsule preview, water log, BMI check, and local-only privacy.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
